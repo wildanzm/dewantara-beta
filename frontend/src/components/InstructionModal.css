@@ -1,0 +1,132 @@
+/* src/components/InstructionModal.css */
+
+.modal-overlay {
+  position: fixed; /* Menempel di layar */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.65
+  ); /* Latar belakang gelap semi-transparan */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Pastikan di atas segalanya */
+  padding: 1rem;
+  /* Animasi muncul overlay */
+  animation: fadeInOverlay 0.3s ease-out forwards;
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 95%; /* Lebih lebar di mobile */
+  position: relative;
+  text-align: left;
+  /* Animasi muncul konten */
+  animation: fadeInModalContent 0.3s ease-out 0.1s forwards; /* Muncul setelah overlay */
+  opacity: 0; /* Mulai dari transparan */
+  transform: translateY(-10px); /* Mulai sedikit dari atas */
+}
+
+@keyframes fadeInModalContent {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.3rem;
+  background: #f1f5f9; /* Latar tombol close */
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #64748b; /* Warna abu-abu */
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.modal-close-button:hover {
+  background-color: #e2e8f0;
+  color: #1a202c;
+}
+
+.modal-content h2 {
+  font-family: "Poppins", sans-serif;
+  color: #1a202c;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.4rem; /* Sesuaikan ukuran font */
+}
+
+.modal-content p {
+  font-family: "Inter", sans-serif;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.modal-content ol {
+  font-family: "Inter", sans-serif;
+  color: #4b5563;
+  line-height: 1.7;
+  padding-left: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.modal-content li {
+  margin-bottom: 0.75rem;
+}
+.modal-content li strong {
+  color: #323434ff;
+}
+
+.modal-confirm-button {
+  width: 100%;
+  padding: 0.8rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #4cbdd9;
+  color: white;
+  transition: background-color 0.3s ease;
+  margin: auto;
+}
+
+.modal-confirm-button:hover {
+  background-color: #2f94adff;
+}

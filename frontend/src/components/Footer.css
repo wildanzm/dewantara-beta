@@ -1,0 +1,191 @@
+/* src/components/Footer.css - DEWANTARA Design */
+
+.footer {
+	width: 100%;
+	padding: 4rem 2rem 2rem 2rem;
+	background-color: var(--color-secondary); /* Dark Grey */
+	color: #a0aec0; /* Light grey text */
+	font-family: var(--font-body);
+}
+
+.footer-container {
+	max-width: 1140px;
+	margin: 0 auto;
+	display: flex;
+	justify-content: space-between;
+	gap: 2rem;
+	flex-wrap: wrap; /* Responsif */
+}
+
+.footer-col {
+	flex: 1;
+	min-width: 220px;
+	margin-bottom: 2rem;
+}
+
+/* Kolom 1: Branding */
+.footer-brand {
+	font-family: var(--font-heading);
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: #ffffff;
+	margin: 0 0 1rem 0;
+}
+
+.footer-tagline {
+	font-size: 0.95rem;
+	line-height: 1.6;
+	max-width: 280px;
+	margin-bottom: 1rem;
+}
+
+.footer-project-info {
+	font-size: 0.9rem;
+	line-height: 1.8;
+	margin-top: 1rem;
+}
+
+.footer-project-info strong {
+	color: var(--color-accent);
+}
+
+.footer-project-info a {
+	color: #ffffff;
+	text-decoration: none;
+	border-bottom: 1px solid transparent;
+	transition: border-color 0.3s ease;
+}
+
+.footer-project-info a:hover {
+	border-bottom-color: var(--color-accent);
+}
+
+/* Kolom 2 & 3: Judul & Link */
+.footer-heading {
+	font-family: var(--font-heading);
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #ffffff;
+	margin: 0 0 1.5rem 0;
+}
+
+.footer-links {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.footer-links li {
+	margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+	color: #a0aec0;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+	color: var(--color-accent);
+	padding-left: 5px;
+}
+
+/* Ikon Sosial Media */
+.social-links {
+	display: flex;
+	gap: 1.25rem;
+}
+
+.social-links a {
+	color: #a0aec0;
+	transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+	color: #ffffff;
+	transform: translateY(-3px); /* Efek mengangkat saat hover */
+}
+
+/* Garis Pemisah */
+.footer-divider {
+	max-width: 1140px;
+	margin: 2rem auto;
+	border-top: 1px solid #2d3748;
+}
+
+/* Bagian Bawah Footer (Copyright) */
+.footer-bottom {
+	text-align: center;
+	font-size: 0.9rem;
+}
+
+/* GANTI SELURUH BLOK @media LAMA ANDA DENGAN YANG BARU INI */
+
+@media (max-width: 768px) {
+	.footer {
+		padding: 3rem 1.5rem;
+	}
+
+	.footer-container {
+		/* Gunakan flexbox dengan wrap untuk membuat baris baru */
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 2.5rem 1rem; /* Jarak vertikal dan horizontal */
+	}
+
+	.footer-col {
+		margin-bottom: 0;
+		/* Reset dari style sebelumnya */
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	/* Baris Atas: Branding (kiri) & Navigasi (kanan) */
+	.footer-col:nth-child(1) {
+		/* Kolom BISINDO-Learn */
+		flex: 1 1 55%; /* Ambil sedikit lebih banyak ruang */
+		min-width: 150px;
+	}
+	.footer-col:nth-child(2) {
+		/* Kolom Navigasi */
+		flex: 1 1 35%; /* Ambil sisa ruang */
+		min-width: 120px;
+	}
+
+	/* Baris Bawah: Sosial Media (tengah) */
+	.footer-col:nth-child(3) {
+		/* Kolom Terhubung */
+		flex: 1 1 100%; /* Ambil lebar penuh untuk baris baru */
+		display: flex;
+		flex-direction: column;
+		align-items: center; /* Pusatkan konten di dalamnya */
+		text-align: center;
+	}
+
+	/* Penyesuaian ukuran font */
+	.footer-brand {
+		font-size: 1.3rem;
+	}
+	.footer-heading {
+		font-size: 1rem;
+		margin-bottom: 1rem;
+	}
+	.footer-tagline {
+		font-size: 0.9rem;
+	}
+
+	/* Penyesuaian link */
+	.footer-links a:hover {
+		padding-left: 0;
+	}
+
+	.social-links {
+		justify-content: center;
+		gap: 1.5rem;
+	}
+
+	.footer-divider {
+		margin: 2.5rem auto 2rem auto;
+	}
+}

@@ -1,0 +1,666 @@
+/* src/pages/BerandaPage.css */
+
+/* --- Font & Animasi (Tetap sama) --- */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&family=Inter:wght@400;500&display=swap");
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+@keyframes scaleIn {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+.animate-fade-in-up {
+	animation: fadeInUp 0.8s ease-out forwards;
+}
+.animate-scale-in {
+	animation: scaleIn 0.8s ease-out forwards;
+}
+.delay-1 {
+	animation-delay: 0.2s;
+}
+.delay-2 {
+	animation-delay: 0.4s;
+}
+.animate-fade-in-up,
+.animate-scale-in {
+	opacity: 0;
+}
+
+/* ===== STRUKTUR DASAR & CONTAINER ===== */
+.beranda-wrapper.new-design {
+	width: 100%;
+	background-color: #f9fafb;
+}
+.beranda-container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 2rem;
+}
+
+/* ===== HERO SECTION BARU ===== */
+.hero-section {
+	padding-top: 6rem;
+	padding-bottom: 8rem;
+	position: relative;
+	overflow: hidden;
+}
+
+/* ===== ELEMEN-ELEMEN SVG DI LATAR BELAKANG ===== */
+.hero-bg-shape {
+	position: absolute;
+	z-index: 0;
+	background-repeat: no-repeat;
+}
+
+/* 1. Blob Maroon Lembut di Latar - DEWANTARA */
+.hero-bg-shape-1 {
+	width: 50%;
+	height: 100%;
+	top: 0;
+	right: 0;
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'%3e%3cpath fill='%23fce7e8' d='M400 658.7c-136.2 0-252.3-95.4-282.7-223.3-25-105.1 27.2-212.4 116-267.3S433.8 68.2 531.4 97.5c115.1 34.6 195.8 141.2 195.8 261.2s-80.7 226.5-195.8 261.2c-32.3 9.7-65.7 14.8-99.3 14.8z'/%3e%3c/svg%3e");
+	background-size: 150%;
+	background-position: -20% 50%;
+	opacity: 0.6;
+}
+
+/* 2. Gelembung Bokeh di Latar - DEWANTARA */
+.hero-bg-shape-2 {
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 800'%3e%3ccircle cx='150' cy='650' r='50' fill='%23fce7e8'/%3e%3ccircle cx='1100' cy='100' r='25' fill='%23fee2e4'/%3e%3c/svg%3e");
+}
+
+/* 3. Aksen Garis di Latar - DEWANTARA */
+.hero-bg-shape-3 {
+	width: 150px;
+	height: 150px;
+	top: 25%;
+	left: 45%;
+	background-image: url("data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M10 90 Q 50 10, 90 50' stroke='%23fca5a5' stroke-width='3' fill='none' stroke-dasharray='5,5'/%3e%3c/svg%3e");
+}
+
+/* ===== KONTEN UTAMA HERO SECTION ===== */
+.hero-section .beranda-container {
+	display: flex;
+	align-items: center;
+	gap: 3rem;
+	position: relative;
+	z-index: 1;
+}
+
+.hero-content {
+	flex: 1;
+}
+.hero-content h1 {
+	font-family: "Poppins", sans-serif;
+	font-size: 3.5rem;
+	font-weight: 700;
+	color: #1a202c;
+	line-height: 1.2;
+	margin-bottom: 1.5rem;
+}
+.hero-content p {
+	font-family: "Inter", sans-serif;
+	font-size: 1.15rem;
+	color: #4a5568;
+	margin-bottom: 2.5rem;
+	max-width: 500px;
+	line-height: 1.8;
+}
+
+.hero-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: "Poppins", sans-serif;
+	padding: 0.9rem 2rem;
+	background-color: var(--color-primary);
+	color: white;
+	text-decoration: none;
+	font-size: 1.1rem;
+	font-weight: 600;
+	border-radius: 8px;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px -5px rgba(182, 37, 42, 0.4);
+}
+.hero-button:hover {
+	background-color: var(--color-accent);
+	transform: translateY(-3px);
+	box-shadow: 0 8px 20px -5px rgba(237, 30, 40, 0.5);
+}
+
+/* ===== ILUSTRASI UTAMA ===== */
+.hero-image {
+	flex: 1.2;
+	text-align: center;
+	position: relative; /* Penting untuk elemen dekoratif di dalamnya */
+}
+.hero-image img {
+	width: 100%;
+	height: auto;
+	position: relative;
+	z-index: 2;
+}
+
+/* 4. Aksen Grafik Garis di dekat Ilustrasi */
+.hero-image-decoration {
+	position: absolute;
+	background-repeat: no-repeat;
+	z-index: 1;
+}
+.hero-image-decoration-1 {
+	width: 150px;
+	height: 100px;
+	top: 0;
+	left: 20%;
+	background-image: url("data:image/svg+xml,%3csvg width='150' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M10 80 C 40 20, 100 20, 140 70' stroke='%23fca5a5' stroke-width='4' fill='none' stroke-dasharray='8,8'/%3e%3c/svg%3e");
+}
+
+/* ... (Sisa style untuk info-section, quote-section, dan @media query bisa Anda hapus atau sesuaikan nanti agar cocok dengan desain baru) ... */
+
+/* ===== INFO SECTION ===== */
+.info-section {
+	padding-top: 6rem;
+	padding-bottom: 8rem;
+}
+
+/* Gunakan CSS Grid untuk tata letak desktop yang fleksibel */
+.info-section .beranda-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr; /* Dua kolom dengan lebar sama */
+	grid-template-rows: auto 1fr; /* Dua baris, tinggi otomatis dan sisa ruang */
+	align-items: center;
+	gap: 3rem 5rem; /* Jarak vertikal dan horizontal */
+}
+
+.info-title {
+	font-family: "Poppins", sans-serif;
+	font-size: 2.2rem;
+	font-weight: 700;
+	color: #1a202c;
+	margin: 0;
+	/* Tempatkan judul di kolom kedua, baris pertama */
+	grid-column: 2 / 3;
+	grid-row: 1 / 2;
+}
+
+.info-image {
+	flex: 0; /* Reset flex */
+	position: relative;
+	/* Tempatkan gambar di kolom pertama, dan rentangkan ke dua baris */
+	grid-column: 1 / 2;
+	grid-row: 1 / 3;
+}
+.info-image img {
+	width: 100%;
+	border-radius: 16px;
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+	position: relative;
+	z-index: 2;
+}
+.info-image::before {
+	content: "";
+	position: absolute;
+	top: -20px;
+	left: -20px;
+	width: 80%;
+	height: 70%;
+	background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+	border-radius: 16px;
+	z-index: 1;
+}
+
+.info-content {
+	flex: 0; /* Reset flex */
+	/* Tempatkan paragraf di kolom kedua, baris kedua */
+	grid-column: 2 / 3;
+	grid-row: 2 / 3;
+	align-self: start; /* Pastikan paragraf mulai dari atas */
+}
+.info-content p {
+	font-family: "Inter", sans-serif;
+	font-size: 1rem;
+	line-height: 1.8;
+	color: #4a5568;
+	margin: 0; /* Hapus margin default */
+	margin-top: -1rem;
+}
+
+.info-section .read-more-link {
+	color: #4cbdd9;
+}
+
+/* ===== QUOTE SECTION ===== */
+/* GANTI SELURUH BLOK CSS UNTUK QUOTE SECTION DENGAN INI */
+
+/* ===== QUOTE SECTION ===== */
+.quote-section {
+	/* 1. Latar Belakang & Bingkai Kartu */
+	background-color: #f7f9ff; /* Warna biru sangat pucat */
+	border: 1px solid #eef2ff; /* Border tipis yang serasi */
+	border-radius: 24px; /* Sudut lebih tumpul */
+	text-align: center;
+	padding: 5rem 3rem; /* Padding vertikal & horizontal yang lebih seimbang */
+	position: relative; /* Penting untuk ikon kutipan */
+	overflow: hidden; /* Mencegah ikon meluber */
+}
+
+/* 2. Ikon Kutipan Raksasa di Latar Belakang */
+.quote-section::before {
+	content: "“";
+	font-family: "Georgia", "Times New Roman", serif; /* Font serif untuk kesan klasik */
+	font-size: 12rem; /* Ukuran sangat besar */
+	font-weight: 700;
+	position: absolute;
+	top: 1rem;
+	left: 2rem;
+	color: #eef2ff; /* Warna sangat pudar agar tidak mengganggu */
+	z-index: 0;
+	line-height: 1;
+}
+
+/* 3. Tipografi yang Disempurnakan */
+.quote-section p {
+	font-family: "Poppins", sans-serif;
+	font-size: 2.1rem; /* Ukuran font sedikit disesuaikan */
+	font-weight: 600; /* Sedikit lebih tipis dari 700 agar lebih elegan */
+	line-height: 1.6;
+	color: #1a202c;
+	max-width: 800px;
+	margin: 0 auto;
+	position: relative; /* Pastikan teks berada di atas ikon */
+	z-index: 1;
+}
+
+.quote-author {
+	display: block;
+	margin-top: 2rem; /* Jarak lebih besar dari kutipan */
+	font-family: "Inter", sans-serif;
+	font-style: italic;
+	color: #718096;
+	position: relative; /* Pastikan teks berada di atas ikon */
+	z-index: 1;
+}
+
+/* Menambahkan tanda hubung (em-dash) sebelum nama penulis */
+.quote-author::before {
+	content: "— ";
+}
+
+/* Hapus pseudo-element lama jika masih ada */
+.quote-section p::before {
+	display: none;
+}
+
+.read-more-link {
+	display: inline-block;
+	margin-top: 1.5rem;
+	font-family: "Poppins", sans-serif;
+	font-weight: 500;
+	color: #3b82f6;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	transition: gap 0.3s ease;
+}
+
+.read-more-link:hover {
+	gap: 0.8rem; /* Efek panah bergeser saat hover */
+	text-decoration: underline;
+}
+
+/* GANTI SELURUH BLOK @media LAMA ANDA DENGAN YANG BARU INI */
+
+@media (max-width: 768px) {
+	.beranda-wrapper.new-design {
+		overflow-x: hidden;
+	}
+	.beranda-container {
+		padding: 0;
+	}
+
+	/* ===== Perbaikan Total Hero Section untuk Mobile ===== */
+	.hero-section {
+		padding: 6rem 1.5rem 4rem 1.5rem;
+		position: relative;
+		overflow: hidden;
+		display: flex; /* Aktifkan flex untuk centering */
+		align-items: center;
+	}
+
+	.hero-section .beranda-container {
+		display: flex;
+		flex-direction: column; /* Konten akan ditumpuk vertikal */
+	}
+
+	/* Dekorasi latar belakang yang subtil */
+	.hero-section::before {
+		content: "";
+		display: block;
+		position: absolute;
+		width: 300px;
+		height: 300px;
+		background: radial-gradient(circle, #eef2ff 0%, transparent 70%);
+		top: 50px;
+		left: -150px;
+		z-index: 0;
+	}
+
+	/* 1. KONTEN TEKS MENJADI URUTAN PERTAMA */
+	.hero-content {
+		order: 1; /* Posisikan di paling atas */
+		z-index: 1;
+		text-align: center; /* Pusatkan teks untuk tampilan yang seimbang */
+		width: 100%;
+	}
+
+	.hero-content h1 {
+		font-size: 1.7rem;
+	}
+
+	.hero-content p {
+		font-size: 0.85rem;
+		line-height: 1.7;
+		max-width: 100%; /* Hapus batasan lebar */
+		margin-bottom: 2rem;
+	}
+
+	.hero-button {
+		width: auto; /* Jangan buat tombol full-width lagi */
+		padding: 0.7rem 1.5rem;
+	}
+
+	/* 2. GAMBAR MENJADI URUTAN KEDUA */
+	.hero-image {
+		order: 2; /* Posisikan di bawah blok teks */
+		position: relative; /* Kembalikan ke alur normal */
+		z-index: 1;
+		width: 100%;
+		max-width: 320px; /* Ukuran yang pas */
+		margin-top: -1rem; /* Beri jarak dari tombol */
+		/* Hapus positioning absolut dari desain sebelumnya */
+		bottom: auto;
+		right: auto;
+		opacity: 1;
+	}
+
+	/* Sembunyikan elemen dekoratif yang tidak perlu */
+	.hero-bg-shape,
+	.hero-image-decoration {
+		display: none;
+	}
+
+	/* ===== Penyesuaian Info Section & Lainnya ===== */
+	.info-section,
+	.quote-section {
+		padding: 4rem 1.5rem;
+	}
+	.info-section {
+		margin-top: -3.3rem;
+	}
+	.quote-section {
+		margin-top: 0.5rem;
+	}
+	.info-section .beranda-container {
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+		gap: 2rem;
+	}
+	.info-title {
+		font-size: 1.5rem;
+		order: 1;
+	}
+	.info-image {
+		order: 2;
+	}
+	.info-content {
+		order: 3;
+	}
+	.info-content p {
+		text-align: left;
+		font-size: 0.95rem;
+		line-height: 1.8;
+	}
+	.quote-section {
+		text-align: center;
+	}
+	.quote-section p {
+		font-size: 1rem;
+	}
+	.quote-author {
+		font-size: 0.8rem;
+	}
+}
+
+/* ===== DEWANTARA NEW SECTIONS ===== */
+
+/* Hero Subhead Styling */
+.hero-subhead {
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--color-text-primary);
+	margin-bottom: 1rem;
+}
+
+.hero-description {
+	font-size: 1.1rem;
+	color: var(--color-text-secondary);
+	line-height: 1.8;
+	max-width: 600px;
+}
+
+.delay-3 {
+	animation-delay: 0.6s;
+}
+
+.delay-4 {
+	animation-delay: 0.8s;
+}
+
+/* Features Section */
+.features-section {
+	padding: 6rem 0;
+	background-color: #ffffff;
+}
+
+.section-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	color: var(--color-primary);
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.section-subtitle {
+	font-size: 1.1rem;
+	color: var(--color-text-secondary);
+	text-align: center;
+	margin-bottom: 4rem;
+}
+
+.features-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 2rem;
+	margin-top: 3rem;
+}
+
+.feature-card {
+	background: var(--color-bg-card);
+	padding: 2.5rem;
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md);
+	transition: all 0.3s ease;
+	text-align: center;
+}
+
+.feature-card:hover {
+	transform: translateY(-8px);
+	box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 1.5rem;
+	background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.feature-icon svg {
+	stroke: white;
+}
+
+.feature-card h3 {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--color-primary);
+	margin-bottom: 1rem;
+}
+
+.feature-card p {
+	font-size: 1rem;
+	color: var(--color-text-secondary);
+	line-height: 1.7;
+}
+
+/* Impact Section */
+.impact-section {
+	padding: 6rem 0;
+	background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+	color: white;
+	text-align: center;
+}
+
+.impact-content h2 {
+	font-size: 2.5rem;
+	font-weight: 700;
+	color: white;
+	margin-bottom: 1.5rem;
+}
+
+.impact-content p {
+	font-size: 1.1rem;
+	line-height: 1.8;
+	max-width: 800px;
+	margin: 0 auto 3rem;
+	color: rgba(255, 255, 255, 0.95);
+}
+
+.impact-stats {
+	display: flex;
+	justify-content: center;
+	gap: 4rem;
+	flex-wrap: wrap;
+}
+
+.stat-item h3 {
+	font-size: 3rem;
+	font-weight: 800;
+	color: white;
+	margin-bottom: 0.5rem;
+}
+
+.stat-item p {
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/* CTA Section */
+.cta-section {
+	padding: 6rem 0;
+	background-color: var(--color-bg-body);
+}
+
+.cta-content {
+	text-align: center;
+	max-width: 700px;
+	margin: 0 auto;
+}
+
+.cta-content h2 {
+	font-size: 2.5rem;
+	font-weight: 700;
+	color: var(--color-primary);
+	margin-bottom: 1rem;
+}
+
+.cta-content p {
+	font-size: 1.1rem;
+	color: var(--color-text-secondary);
+	margin-bottom: 2rem;
+}
+
+.cta-button-large {
+	display: inline-block;
+	padding: 1.25rem 3rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	font-family: var(--font-heading);
+	background-color: var(--color-primary);
+	color: white;
+	border-radius: var(--radius-md);
+	text-decoration: none;
+	transition: all 0.3s ease;
+	box-shadow: var(--shadow-md);
+}
+
+.cta-button-large:hover {
+	background-color: var(--color-accent);
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-lg);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+	.hero-subhead {
+		font-size: 1.2rem;
+	}
+
+	.hero-description {
+		font-size: 1rem;
+	}
+
+	.section-title {
+		font-size: 2rem;
+	}
+
+	.features-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.impact-stats {
+		gap: 2rem;
+	}
+
+	.stat-item h3 {
+		font-size: 2rem;
+	}
+
+	.cta-content h2 {
+		font-size: 2rem;
+	}
+}

@@ -1,0 +1,146 @@
+/* src/pages/HubungiKamiPage.css */
+
+.hubungi-kami-page {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 6rem 2rem;
+	background-color: var(--color-bg-body); /* Latar belakang terang DEWANTARA */
+}
+
+.page-header {
+	max-width: 650px;
+	margin-bottom: 2rem;
+}
+
+.page-header h1 {
+	font-family: "Poppins", sans-serif;
+	font-size: 3rem;
+	color: #1a202c;
+	margin-bottom: 1rem;
+}
+
+.page-header p {
+	font-family: "Inter", sans-serif;
+	font-size: 1rem;
+	color: #4a5568;
+	line-height: 1.7;
+}
+
+/* ===== Kartu Kontak Utama ===== */
+.contact-card {
+	width: 100%;
+	max-width: 500px;
+	background-color: #ffffff;
+	padding: 3rem;
+	border-radius: 20px;
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.icon-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(182, 37, 42, 0.1), rgba(237, 30, 40, 0.15)); /* Gradient maroon lembut */
+	margin-bottom: 2rem;
+}
+
+.icon-wrapper svg {
+	color: var(--color-primary); /* Warna maroon utama */
+	width: 36px;
+	height: 36px;
+}
+
+.contact-card h3 {
+	font-family: "Poppins", sans-serif;
+	font-size: 1.5rem;
+	color: #1a202c;
+	margin: 0 0 0.5rem 0;
+}
+
+.email-address {
+	font-family: "Inter", sans-serif;
+	font-size: 1.1rem;
+	color: #4a5568;
+	margin-bottom: 2rem;
+	word-break: break-all;
+}
+
+.email-button {
+	width: 100%;
+	padding: 1rem;
+	font-family: "Poppins", sans-serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: 12px;
+	border: none;
+	cursor: pointer;
+	background-color: var(--color-primary);
+	color: white;
+	box-shadow: 0 10px 20px -10px rgba(182, 37, 42, 0.5);
+	transition: all 0.3s ease;
+}
+
+.email-button:hover {
+	background-color: var(--color-accent);
+	transform: translateY(-3px);
+	box-shadow: 0 15px 25px -10px rgba(237, 30, 40, 0.6);
+}
+
+/* ===== Bagian Sosial Media ===== */
+.social-section {
+	margin-top: 4rem;
+	color: #718096;
+}
+
+.social-links-hubungi {
+	display: flex;
+	gap: 2rem;
+	margin-top: 1.5rem;
+	justify-content: center;
+}
+
+.social-links-hubungi a {
+	color: #a0aec0;
+	transition: all 0.3s ease;
+}
+
+.social-links-hubungi a:hover {
+	color: var(--color-primary);
+	transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+	.hubungi-kami-page {
+		padding: 2rem 1rem;
+	}
+	.hubungi-container {
+		grid-template-columns: 1fr; /* Sudah di-handle sebelumnya, ini untuk penegasan */
+	}
+	.page-header h1 {
+		font-size: 2rem;
+		margin-top: 3.7rem;
+	}
+	.page-header p {
+		font-size: 0.9rem;
+		margin-bottom: -0.5rem;
+	}
+	.info-section,
+	.form-section {
+		padding: 2rem;
+	}
+
+	.contact-card {
+		padding: 1.5rem;
+	}
+}

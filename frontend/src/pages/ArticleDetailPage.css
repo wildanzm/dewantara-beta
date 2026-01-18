@@ -1,0 +1,150 @@
+/* src/pages/ArticleDetailPage.css (VERSI BARU & DIrombak) */
+
+.article-detail-page {
+  width: 100%;
+  background-color: #ffffff; /* Pastikan latar belakang putih bersih */
+}
+
+/* ===== Header Halaman Detail Artikel ===== */
+.article-detail-header {
+  height: 45vh; /* Sedikit lebih tinggi */
+  min-height: 350px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end; /* Teks menempel di bawah */
+  padding: 1rem 2rem;
+  color: white;
+}
+
+/* Overlay gradien yang lebih halus */
+.article-detail-header .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* DIUBAH: Gradien lebih pekat dan mulai dari posisi lebih tinggi */
+  background: linear-gradient(
+    to top,
+    rgba(17, 24, 39, 0.9) 20%,
+    transparent 80%
+  );
+}
+
+.article-detail-header .header-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.article-detail-header .article-category {
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: #4cbdd9;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.article-detail-header h1 {
+  font-family: "Poppins", sans-serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: #4cbdd9;
+  line-height: 1.25;
+  /* DIUBAH: Bayangan teks lebih tebal untuk membantu keterbacaan */
+  text-shadow: 0 3px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Konten Artikel ===== */
+.article-content-wrapper {
+  max-width: 750px; /* Lebar optimal untuk membaca */
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Blob dekoratif di belakang teks */
+.article-content-wrapper::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #f7f9ff 0%, transparent 70%);
+  top: 10%;
+  left: -200px;
+  z-index: -1;
+}
+
+/* Tipografi di dalam Artikel */
+.article-body {
+  font-family: "Inter", sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.9; /* Jarak baris lebih besar untuk kenyamanan membaca */
+  color: #374151; /* Warna teks tidak terlalu hitam pekat */
+}
+
+.article-body h2 {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.article-body p {
+  margin-bottom: 1.5rem;
+}
+
+/* Tautan Kembali yang Diperbarui */
+.back-link {
+  display: inline-block;
+  margin-top: 3rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  color: #4cbdd9;
+  text-decoration: none;
+  border: 1px solid #e0e7ff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+.back-link:hover {
+  background-color: #eef2ff;
+  border-color: #dbeafe;
+}
+
+.artikel-not-found {
+  text-align: center;
+  margin-top: 5rem;
+  padding: 2rem;
+}
+
+/* ===== Responsif ===== */
+@media (max-width: 768px) {
+  .article-detail-header {
+    padding: 3rem 1.5rem;
+    height: 40vh;
+  }
+  .article-detail-header h1 {
+    font-size: 2rem;
+  }
+  .article-content-wrapper {
+    padding: 3rem 1.5rem;
+  }
+  .article-body {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+}

@@ -1,0 +1,240 @@
+/* src/components/Navbar.css - DEWANTARA Design */
+
+.navbar {
+	width: 100%;
+	padding: 1.5rem 2rem;
+	background-color: transparent;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efek saat di-scroll */
+.navbar.scrolled {
+	background-color: rgba(255, 255, 255, 0.95); /* Latar putih semi-transparan */
+	backdrop-filter: blur(10px); /* Efek blur "kaca buram" */
+	-webkit-backdrop-filter: blur(10px); /* Untuk support browser Safari */
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); /* Shadow lembut untuk memberi kedalaman */
+}
+
+.navbar-container {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.navbar-left .navbar-brand {
+	display: flex; /* Aktifkan flexbox */
+	align-items: center; /* Sejajarkan logo & teks secara vertikal */
+	gap: 0.75rem; /* Beri jarak antara logo dan teks */
+	font-size: 1.6rem;
+	font-weight: 700;
+	font-family: var(--font-heading);
+	color: var(--color-primary); /* Use DEWANTARA maroon */
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.navbar-left .navbar-brand:hover {
+	color: var(--color-accent); /* Bright red on hover */
+}
+
+.navbar-logo {
+	height: 35px; /* Slightly larger for better visibility */
+	width: auto;
+	display: block;
+}
+
+.navbar-center {
+	display: flex;
+	gap: 3rem;
+}
+
+.navbar-center .mobile-cta {
+	display: none; /* Sembunyikan tombol ini di desktop */
+}
+
+.nav-link {
+	font-family: var(--font-body);
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--color-text-secondary);
+	text-decoration: none;
+	transition: color 0.3s ease;
+	position: relative;
+}
+
+.nav-link:hover {
+	color: var(--color-primary);
+}
+
+.nav-link.active {
+	color: var(--color-primary);
+	font-weight: 600;
+}
+
+.nav-link.active::after {
+	content: "";
+	position: absolute;
+	bottom: -5px;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background-color: var(--color-accent);
+}
+
+.navbar-right {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+/* Tombol CTA dengan DEWANTARA styling */
+.navbar-right .cta-button {
+	display: inline-block;
+	padding: 0.75rem 1.5rem;
+	background-color: var(--color-primary);
+	color: white;
+	border-radius: var(--radius-sm);
+	text-decoration: none;
+	font-family: var(--font-heading);
+	font-weight: 600;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 15px -5px rgba(182, 37, 42, 0.4);
+}
+
+.navbar-right .cta-button:hover {
+	background-color: var(--color-accent);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 20px -5px rgba(237, 30, 40, 0.5);
+}
+
+/* Tombol Hamburger (awalnya disembunyikan) */
+.hamburger {
+	display: none;
+	flex-direction: column;
+	justify-content: space-around;
+	width: 2rem;
+	height: 2rem;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	z-index: 10;
+}
+
+.hamburger-bar {
+	width: 2rem;
+	height: 0.25rem;
+	background-color: #333;
+	border-radius: 10px;
+}
+
+/* ===== RESPONSIVE ===== */
+/* Pastikan blok ini terpisah dengan benar */
+@media (max-width: 768px) {
+	.navbar-center {
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: auto;
+		width: 70%;
+		max-width: 300px;
+		height: 100vh;
+		background-color: rgba(26, 32, 44, 0.8);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-end;
+		gap: 2rem;
+		padding: 6rem 2rem;
+		box-shadow: -10px 0px 30px -15px rgba(0, 0, 0, 0.3);
+		z-index: 5;
+		transform: translateX(100%);
+		transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+	}
+
+	.navbar-center.active {
+		transform: translateX(0);
+	}
+
+	.navbar-brand span {
+		display: none;
+	}
+	.navbar-logo {
+		height: 35px; /* Atur tinggi logo (sesuaikan nilainya) */
+		width: auto; /* Biarkan lebar menyesuaikan */
+		display: block; /* Hilangkan spasi ekstra di bawah gambar */
+	}
+
+	.nav-link {
+		font-size: 1.5rem;
+		font-weight: 500;
+		color: #cbd5e1;
+		text-align: right;
+		transition: color 0.3s ease;
+	}
+
+	.nav-link:hover,
+	.nav-link.active {
+		color: #ffffff;
+		font-weight: 700;
+	}
+
+	/* --- PERBAIKAN UTAMA DI SINI --- */
+
+	/* 1. Aturan untuk menampilkan tombol di dalam menu mobile */
+	.navbar-center .mobile-cta {
+		display: inline-block; /* Pastikan tombol ini terlihat */
+		margin-top: 0rem;
+		padding: 0.8rem 2rem;
+		font-size: 1.1rem;
+		text-align: center;
+		/* Gunakan style tombol yang konsisten */
+		background-color: #4cbdd9;
+		border-radius: 8px;
+		text-decoration: none;
+		color: white;
+	}
+
+	/* 2. Aturan untuk menyembunyikan tombol di navbar kanan */
+	.navbar-right .cta-button {
+		display: none;
+	}
+
+	/* --- AKHIR PERBAIKAN --- */
+
+	.hamburger {
+		display: flex;
+		margin-left: 1rem;
+		z-index: 10;
+		position: relative;
+	}
+
+	.hamburger-bar {
+		background-color: #333;
+		transition: all 0.3s ease-in-out;
+	}
+
+	.hamburger.active .hamburger-bar {
+		background-color: #ffffff;
+	}
+
+	.hamburger.active .hamburger-bar:nth-child(1) {
+		transform: translateY(0.65rem) rotate(45deg);
+	}
+
+	.hamburger.active .hamburger-bar:nth-child(2) {
+		opacity: 0;
+	}
+
+	.hamburger.active .hamburger-bar:nth-child(3) {
+		transform: translateY(-0.65rem) rotate(-45deg);
+	}
+}

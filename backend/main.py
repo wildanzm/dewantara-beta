@@ -3,6 +3,7 @@ import cv2
 import joblib
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 import asyncio
 
@@ -97,6 +98,23 @@ class SignLanguageDetector:
     
 # Inisialisasi FastAPI
 app = FastAPI()
+
+# Configure CORS for production
+origins = [
+    "http://localhost:3000",           # Local development
+    "http://127.0.0.1:3000",           # Local development alternative
+    "https://dewantara.cloud",         # Production domain
+    "https://www.dewantara.cloud",     # Production domain with www
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 detector = SignLanguageDetector() #objek detektor
 
 #endpoint websocket

@@ -2,13 +2,15 @@
 
 .navbar {
 	width: 100%;
-	padding: 1.5rem 2rem;
+	padding: 1rem 1.5rem;
 	background-color: transparent;
 	position: fixed;
 	top: 0;
 	left: 0;
 	z-index: 1000;
-	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	transition:
+		background-color 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
 /* Efek saat di-scroll */
@@ -21,18 +23,19 @@
 
 .navbar-container {
 	width: 100%;
-	max-width: 1200px;
+	max-width: 100%;
 	margin: 0 auto;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	padding: 0 1rem;
 }
 
 .navbar-left .navbar-brand {
 	display: flex; /* Aktifkan flexbox */
 	align-items: center; /* Sejajarkan logo & teks secara vertikal */
-	gap: 0.75rem; /* Beri jarak antara logo dan teks */
-	font-size: 1.6rem;
+	gap: 0.5rem; /* Beri jarak antara logo dan teks */
+	font-size: 1.3rem;
 	font-weight: 700;
 	font-family: var(--font-heading);
 	color: var(--color-primary); /* Use DEWANTARA maroon */
@@ -45,14 +48,14 @@
 }
 
 .navbar-logo {
-	height: 35px; /* Slightly larger for better visibility */
+	height: 30px; /* Slightly larger for better visibility */
 	width: auto;
 	display: block;
 }
 
 .navbar-center {
 	display: flex;
-	gap: 3rem;
+	gap: 2rem;
 }
 
 .navbar-center .mobile-cta {
@@ -136,8 +139,40 @@
 }
 
 /* ===== RESPONSIVE ===== */
+/* Tablet Landscape */
+@media (max-width: 1024px) {
+	.navbar-center {
+		gap: 1.5rem;
+	}
+
+	.nav-link {
+		font-size: 0.95rem;
+	}
+
+	.navbar-container {
+		padding: 0 0.5rem;
+	}
+}
+
 /* Pastikan blok ini terpisah dengan benar */
 @media (max-width: 768px) {
+	.navbar {
+		padding: 0.75rem 1rem;
+	}
+
+	.navbar-container {
+		padding: 0 0.25rem;
+	}
+
+	.navbar-left .navbar-brand {
+		font-size: 1.1rem;
+		gap: 0.4rem;
+	}
+
+	.navbar-logo {
+		height: 28px;
+	}
+
 	.navbar-center {
 		position: fixed;
 		top: 0;

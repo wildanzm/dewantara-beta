@@ -1,0 +1,292 @@
+/* src/components/gamification/FeedbackOverlay.css */
+.feedback-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 9999;
+	animation: fadeIn 0.3s ease-out;
+	padding: 1rem;
+}
+
+/* Confetti Effect */
+.confetti-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.confetti {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	top: -10px;
+	animation: confettiFall 3s linear infinite;
+	opacity: 0.8;
+}
+
+@keyframes confettiFall {
+	to {
+		transform: translateY(100vh) rotate(360deg);
+	}
+}
+
+/* Feedback Card */
+.feedback-card {
+	background: white;
+	border-radius: 24px;
+	padding: 3rem 2rem;
+	max-width: 500px;
+	width: 100%;
+	text-align: center;
+	animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.feedback-icon {
+	font-size: 5rem;
+	margin-bottom: 1rem;
+	animation: bounce 1s ease-in-out infinite;
+}
+
+.feedback-title {
+	font-size: 2rem;
+	font-weight: bold;
+	color: #333;
+	margin: 0 0 2rem 0;
+}
+
+/* Stars Display */
+.feedback-stars {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.feedback-star {
+	font-size: 3rem;
+	animation: starBounce 0.6s ease-out forwards;
+	opacity: 0;
+	transform: scale(0);
+}
+
+.feedback-star.earned {
+	filter: drop-shadow(0 4px 8px rgba(255, 215, 0, 0.5));
+}
+
+.feedback-star.empty {
+	opacity: 0.2;
+}
+
+/* Stats Grid */
+.feedback-stats {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+	margin-bottom: 2rem;
+}
+
+.stat-item {
+	background: #f8f9fa;
+	padding: 1rem;
+	border-radius: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.stat-label {
+	font-size: 0.85rem;
+	color: #666;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #333;
+}
+
+/* Message */
+.feedback-message {
+	font-size: 1.1rem;
+	color: #555;
+	margin-bottom: 2rem;
+	line-height: 1.5;
+}
+
+/* Button */
+.feedback-button {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	border: none;
+	padding: 1rem 2.5rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	border-radius: 50px;
+	cursor: pointer;
+	transition: all 0.3s;
+	box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.feedback-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.feedback-button:active {
+	transform: translateY(0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes scaleIn {
+	from {
+		transform: scale(0.5);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+@keyframes bounce {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-20px);
+	}
+}
+
+@keyframes starBounce {
+	0% {
+		opacity: 0;
+		transform: scale(0) rotate(0deg);
+	}
+	50% {
+		transform: scale(1.3) rotate(180deg);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) rotate(360deg);
+	}
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.feedback-card {
+		padding: 2rem 1.5rem;
+		max-width: 90vw;
+	}
+
+	.feedback-icon {
+		font-size: 4rem;
+	}
+
+	.feedback-title {
+		font-size: 1.5rem;
+	}
+
+	.feedback-stars {
+		gap: 0.5rem;
+	}
+
+	.feedback-star {
+		font-size: 2.5rem;
+	}
+
+	.stat-value {
+		font-size: 1.25rem;
+	}
+
+	.feedback-message {
+		font-size: 1rem;
+	}
+
+	.feedback-button {
+		padding: 0.875rem 2rem;
+		font-size: 1rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.feedback-overlay {
+		padding: 0.5rem;
+	}
+
+	.feedback-card {
+		padding: 1.5rem 1rem;
+		max-width: 95vw;
+		border-radius: 20px;
+	}
+
+	.feedback-icon {
+		font-size: 3rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.feedback-title {
+		font-size: 1.25rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.feedback-stars {
+		gap: 0.4rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.feedback-star {
+		font-size: 2rem;
+	}
+
+	.feedback-stats {
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.stat-item {
+		padding: 0.75rem;
+		border-radius: 10px;
+	}
+
+	.stat-label {
+		font-size: 0.75rem;
+	}
+
+	.stat-value {
+		font-size: 1.1rem;
+	}
+
+	.feedback-message {
+		font-size: 0.9rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.feedback-button {
+		padding: 0.75rem 1.5rem;
+		font-size: 0.95rem;
+		border-radius: 40px;
+	}
+}

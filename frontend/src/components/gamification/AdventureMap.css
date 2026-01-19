@@ -1,0 +1,237 @@
+/* src/components/gamification/AdventureMap.css */
+.adventure-map {
+	width: 100%;
+	min-height: calc(100vh - 6rem); /* Account for navbar and padding */
+	background: transparent;
+	padding: 2rem 0.5rem 2.5rem;
+	position: relative;
+	overflow-x: hidden;
+	border-radius: 20px;
+	margin: 0;
+	box-shadow: none;
+}
+
+/* Header Stats */
+.map-header {
+	display: flex;
+	justify-content: center;
+	gap: 1rem;
+	margin-bottom: 2rem;
+	flex-wrap: wrap;
+	padding: 0 1rem;
+}
+
+.stat-card {
+	background: white;
+	border-radius: 16px;
+	padding: 1.25rem 1.5rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	transition: transform 0.2s;
+	flex: 1;
+	min-width: 150px;
+	max-width: 180px;
+}
+
+.stat-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+	font-size: 2.5rem;
+}
+
+.stat-info {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: 0.25rem;
+}
+
+.stat-label {
+	font-size: 0.7rem;
+	color: #64748b;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	font-size: 1.5rem;
+	font-weight: bold;
+	color: #1e293b;
+}
+
+/* Scrollable Map Container */
+.map-scroll-container {
+	width: 98%;
+	max-width: none;
+	margin: 0 auto;
+	padding: 2rem 0.5rem;
+}
+
+.map-path {
+	position: relative;
+	padding: 0.5rem;
+}
+
+/* Large Desktop */
+@media (min-width: 1200px) {
+	.map-scroll-container {
+		max-width: none;
+		padding: 2.5rem 1rem;
+	}
+
+	.adventure-map {
+		padding: 3rem 2rem 4rem;
+	}
+
+	.map-header {
+		gap: 1.5rem;
+		margin-bottom: 2.5rem;
+	}
+
+	.stat-card {
+		padding: 1.25rem 2rem;
+	}
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+	.adventure-map {
+		padding: 1.5rem 0.5rem 2rem;
+		border-radius: 16px;
+		min-height: auto;
+	}
+
+	.map-header {
+		gap: 0.5rem;
+		padding: 0 0.25rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.stat-card {
+		padding: 0.65rem 0.85rem;
+		flex: 1 1 auto;
+		min-width: 95px;
+		max-width: none;
+		border-radius: 14px;
+	}
+
+	.stat-icon {
+		font-size: 1.4rem;
+	}
+
+	.stat-label {
+		font-size: 0.65rem;
+		white-space: nowrap;
+	}
+
+	.stat-value {
+		font-size: 1rem;
+		white-space: nowrap;
+	}
+
+	.map-scroll-container {
+		padding: 1rem 0.25rem;
+		max-width: 100%;
+	}
+}
+
+@media (max-width: 480px) {
+	.adventure-map {
+		padding: 1rem 0.25rem 1.5rem;
+		border-radius: 12px;
+	}
+
+	.map-header {
+		gap: 0.35rem;
+		margin-bottom: 1rem;
+		padding: 0;
+	}
+
+	.stat-card {
+		padding: 0.5rem 0.65rem;
+		flex: 1 1 0;
+		min-width: 0;
+		max-width: none;
+		border-radius: 12px;
+		gap: 0.5rem;
+	}
+
+	.stat-icon {
+		font-size: 1.2rem;
+		flex-shrink: 0;
+	}
+
+	.stat-info {
+		min-width: 0;
+		flex: 1;
+	}
+
+	.stat-label {
+		font-size: 0.58rem;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.stat-value {
+		font-size: 0.85rem;
+		white-space: nowrap;
+	}
+
+	.map-scroll-container {
+		padding: 0.5rem 0;
+		max-width: 100%;
+	}
+
+	.map-path {
+		padding: 0.25rem;
+	}
+}
+
+/* Extra small devices (320px and below) */
+@media (max-width: 360px) {
+	.adventure-map {
+		padding: 0.75rem 0.15rem 1.25rem;
+		border-radius: 10px;
+	}
+
+	.map-header {
+		gap: 0.3rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.stat-card {
+		padding: 0.4rem 0.5rem;
+		border-radius: 10px;
+		gap: 0.4rem;
+	}
+
+	.stat-icon {
+		font-size: 1.1rem;
+	}
+
+	.stat-label {
+		font-size: 0.55rem;
+		letter-spacing: 0;
+	}
+
+	.stat-value {
+		font-size: 0.8rem;
+	}
+
+	.map-scroll-container {
+		padding: 0.25rem 0;
+	}
+
+	.map-path {
+		padding: 0.15rem;
+	}
+}

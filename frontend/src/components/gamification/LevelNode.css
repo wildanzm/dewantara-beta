@@ -1,0 +1,376 @@
+/* src/components/gamification/LevelNode.css */
+.level-node-container {
+	position: relative;
+	margin: 3rem 0;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.level-node-container.even {
+	justify-content: flex-end;
+	padding-right: min(8%, 80px);
+}
+
+.level-node-container.odd {
+	justify-content: flex-start;
+	padding-left: min(8%, 80px);
+}
+
+/* The Level Node Card */
+.level-node {
+	position: relative;
+	background: white;
+	border-radius: 20px;
+	padding: 1.5rem;
+	width: 100%;
+	max-width: 320px;
+	border: 4px solid;
+	cursor: pointer;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+	overflow: hidden;
+	z-index: 1;
+}
+
+.level-node:hover:not(.locked) {
+	transform: translateY(-8px) scale(1.02);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+.level-node.locked {
+	filter: grayscale(1);
+	opacity: 0.6;
+	cursor: not-allowed;
+	border-color: #ccc !important;
+}
+
+.level-node.completed {
+	background: linear-gradient(135deg, #fff 0%, #fffacd 100%);
+}
+
+/* Lock Overlay */
+.lock-overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.3);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 10;
+	border-radius: 16px;
+}
+
+.lock-icon {
+	font-size: 3rem;
+	animation: pulse 2s infinite;
+}
+
+/* Level Icon */
+.level-icon {
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2.5rem;
+	margin: 0 auto 1rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Level Info */
+.level-info {
+	text-align: center;
+	margin-bottom: 1rem;
+}
+
+.level-title {
+	font-size: 1.25rem;
+	font-weight: bold;
+	color: #333;
+	margin: 0 0 0.25rem 0;
+}
+
+.level-subtitle {
+	font-size: 0.9rem;
+	color: #666;
+	margin: 0 0 0.5rem 0;
+}
+
+.level-letters {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #555;
+	letter-spacing: 2px;
+}
+
+/* Stars */
+.level-stars {
+	display: flex;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-top: 1rem;
+}
+
+.star {
+	font-size: 1.5rem;
+	transition: transform 0.2s;
+}
+
+.star.earned {
+	animation: starPop 0.5s ease-out;
+}
+
+.star.empty {
+	opacity: 0.3;
+}
+
+/* Completion Badge */
+.completion-badge {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	width: 35px;
+	height: 35px;
+	background: #4caf50;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: 1.25rem;
+	font-weight: bold;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Connecting Path Line */
+.path-line {
+	position: absolute;
+	width: 16px;
+	height: 120px;
+	background: linear-gradient(180deg, #58cc02 0%, #58cc02 100%);
+	top: -120px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 0;
+	border: 3px solid #46a302;
+	box-shadow:
+		0 4px 8px rgba(0, 0, 0, 0.15),
+		inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+/* Path melengkung untuk level ganjil (dari kanan ke kiri) */
+.level-node-container.odd .path-line {
+	border-radius: 0 0 80px 0;
+	left: auto;
+	right: 50%;
+	transform: translateX(50%);
+	width: 120px;
+	height: 120px;
+	border-right: none;
+	border-top: none;
+	background: transparent;
+}
+
+/* Path melengkung untuk level genap (dari kiri ke kanan) */
+.level-node-container.even .path-line {
+	border-radius: 0 0 0 80px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 120px;
+	height: 120px;
+	border-left: none;
+	border-top: none;
+	background: transparent;
+}
+
+/* Glossy highlight effect untuk straight path */
+.level-node-container.odd .path-line::before,
+.level-node-container.even .path-line::before {
+	content: "";
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	width: 30%;
+	height: 30%;
+	background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+	border-radius: 50%;
+	pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
+}
+
+@keyframes starPop {
+	0% {
+		transform: scale(0);
+	}
+	50% {
+		transform: scale(1.3);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.level-node-container {
+		margin: 1.5rem 0;
+	}
+
+	.level-node {
+		max-width: min(260px, 92vw);
+		padding: 1.25rem;
+	}
+
+	.level-node-container.even,
+	.level-node-container.odd {
+		padding: 0;
+		justify-content: center;
+	}
+
+	.level-icon {
+		width: 60px;
+		height: 60px;
+		font-size: 2rem;
+	}
+
+	.level-title {
+		font-size: 1.15rem;
+	}
+
+	.level-subtitle {
+		font-size: 0.85rem;
+	}
+
+	.level-letters {
+		font-size: 0.95rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.level-node-container {
+		margin: 1.2rem 0;
+	}
+
+	.level-node {
+		max-width: min(220px, 96vw);
+		padding: 1rem;
+		border-width: 3px;
+		border-radius: 16px;
+	}
+
+	.level-icon {
+		width: 50px;
+		height: 50px;
+		font-size: 1.75rem;
+	}
+
+	.level-title {
+		font-size: 1rem;
+	}
+
+	.level-subtitle {
+		font-size: 0.8rem;
+	}
+
+	.level-letters {
+		font-size: 0.875rem;
+		letter-spacing: 1px;
+	}
+
+	.level-stars {
+		gap: 0.4rem;
+		margin-top: 0.75rem;
+	}
+
+	.star {
+		font-size: 1.25rem;
+	}
+
+	.completion-badge {
+		width: 30px;
+		height: 30px;
+		font-size: 1rem;
+		top: 8px;
+		right: 8px;
+	}
+
+	.path-line {
+		height: 40px;
+		top: -40px;
+	}
+}
+
+@media (max-width: 360px) {
+	.level-node-container {
+		margin: 1rem 0;
+	}
+
+	.level-node {
+		max-width: min(200px, 98vw);
+		padding: 0.875rem;
+		border-width: 2px;
+		border-radius: 14px;
+	}
+
+	.level-icon {
+		width: 45px;
+		height: 45px;
+		font-size: 1.6rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.level-title {
+		font-size: 0.95rem;
+	}
+
+	.level-subtitle {
+		font-size: 0.75rem;
+	}
+
+	.level-letters {
+		font-size: 0.8rem;
+		letter-spacing: 0.5px;
+	}
+
+	.level-stars {
+		gap: 0.3rem;
+		margin-top: 0.65rem;
+	}
+
+	.star {
+		font-size: 1.1rem;
+	}
+
+	.completion-badge {
+		width: 26px;
+		height: 26px;
+		font-size: 0.9rem;
+		top: 6px;
+		right: 6px;
+	}
+
+	.lock-icon {
+		font-size: 2.5rem;
+	}
+
+	.path-line {
+		height: 35px;
+		top: -35px;
+		width: 3px;
+	}
+}

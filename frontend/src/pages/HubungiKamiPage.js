@@ -3,7 +3,7 @@ import React from "react";
 import "./HubungiKamiPage.css"; // Impor file CSS yang akan kita ubah
 
 function HubungiKamiPage() {
-	const email = "info@dewantara.com";
+	const email = "info@dewantara.cloud";
 
 	return (
 		<div className="hubungi-kami-page">

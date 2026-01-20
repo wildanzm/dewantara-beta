@@ -33,7 +33,6 @@ function LevelPlayPage() {
 	const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
 	const [prediction, setPrediction] = useState("-");
 	const [confidence, setConfidence] = useState(0);
-	const [showFeedback, setShowFeedback] = useState(false);
 	const [showLevelComplete, setShowLevelComplete] = useState(false);
 	const [levelStats, setLevelStats] = useState({ stars: 0, xp: 0, time: 0 });
 	const [showLetterSuccess, setShowLetterSuccess] = useState(false);
@@ -41,7 +40,6 @@ function LevelPlayPage() {
 	const [levelStartTime, setLevelStartTime] = useState(null);
 	const [letterStartTime, setLetterStartTime] = useState(null);
 	const [letterCompletionTimes, setLetterCompletionTimes] = useState([]);
-	const [mistakes, setMistakes] = useState(0);
 
 	// Redirect if level not found
 	useEffect(() => {
@@ -201,7 +199,7 @@ function LevelPlayPage() {
 	/**
 	 * Stop camera and cleanup
 	 */
-	const stopCamera = () => {
+	const stopCamera = useCallback(() => {
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track) => track.stop());
 		}
@@ -211,7 +209,7 @@ function LevelPlayPage() {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
 		}
-	};
+	}, []);
 
 	/**
 	 * Send video frame to backend

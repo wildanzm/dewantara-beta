@@ -160,6 +160,7 @@
 
 /* Status Bar */
 .video-status-bar {
+	position: relative;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -238,6 +239,43 @@
 	border: 2px solid rgba(220, 38, 38, 0.15);
 }
 
+/* Camera Switch Button */
+.camera-switch-btn {
+	position: absolute;
+	right: 1.25rem;
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.75rem;
+	background: white;
+	border: 2px solid #cbd5e1;
+	border-radius: 12px;
+	color: #334155;
+	cursor: pointer;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	outline: none;
+	width: 3rem;
+	height: 3rem;
+}
+
+.camera-switch-btn:hover,
+.camera-switch-btn:active,
+.camera-switch-btn:focus {
+	background: white;
+	border-color: #cbd5e1;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	transform: translateY(-50%);
+}
+
+.camera-switch-btn svg {
+	width: 28px;
+	height: 28px;
+	color: #64748b;
+	flex-shrink: 0;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
 	.video-display-card {
@@ -290,6 +328,19 @@
 		font-size: 1.5rem;
 		font-weight: 900;
 		border-radius: 11px;
+	}
+
+	.camera-switch-btn {
+		right: 1rem;
+		width: 2.75rem;
+		height: 2.75rem;
+		padding: 0.65rem;
+		border-radius: 11px;
+	}
+
+	.camera-switch-btn svg {
+		width: 26px;
+		height: 26px;
 	}
 }
 
@@ -354,5 +405,18 @@
 		font-size: 1.375rem;
 		font-weight: 900;
 		border-radius: 10px;
+	}
+
+	.camera-switch-btn {
+		right: 0.875rem;
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0.55rem;
+		border-radius: 10px;
+	}
+
+	.camera-switch-btn svg {
+		width: 24px;
+		height: 24px;
 	}
 }

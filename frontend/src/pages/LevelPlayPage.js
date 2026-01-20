@@ -29,6 +29,7 @@ function LevelPlayPage() {
 
 	// Game state
 	const [isCameraOn, setIsCameraOn] = useState(false);
+	const [facingMode, setFacingMode] = useState("user"); // "user" for front, "environment" for back
 	const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
 	const [prediction, setPrediction] = useState("-");
 	const [confidence, setConfidence] = useState(0);
@@ -85,7 +86,7 @@ function LevelPlayPage() {
 
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({
-				video: { facingMode: "user" },
+				video: { facingMode: facingMode },
 				audio: false,
 			});
 
@@ -130,7 +131,6 @@ function LevelPlayPage() {
 			};
 
 			socketRef.current.onclose = () => {
-				console.log("WebSocket disconnected");
 				if (intervalRef.current) {
 					clearInterval(intervalRef.current);
 					intervalRef.current = null;
@@ -158,6 +158,43 @@ function LevelPlayPage() {
 			}).then(() => {
 				navigate("/belajar");
 			});
+		}
+	};
+
+	/**
+	 * Toggle between front and back camera
+	 */
+	const toggleCamera = async () => {
+		const newFacingMode = facingMode === "user" ? "environment" : "user";
+		setFacingMode(newFacingMode);
+
+		// Stop current stream
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach((track) => track.stop());
+		}
+
+		// Start new stream with new facing mode
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: { facingMode: newFacingMode },
+				audio: false,
+			});
+
+			streamRef.current = stream;
+			if (videoRef.current) {
+				videoRef.current.srcObject = stream;
+			}
+		} catch (error) {
+			console.error("Camera switch error:", error);
+			Swal.fire({
+				icon: "error",
+				title: "Gagal Mengganti Kamera",
+				text: "Tidak dapat mengganti kamera. Pastikan perangkat Anda memiliki kamera depan dan belakang.",
+				timer: 2000,
+				showConfirmButton: false,
+			});
+			// Revert to previous facing mode
+			setFacingMode(facingMode);
 		}
 	};
 
@@ -211,8 +248,6 @@ function LevelPlayPage() {
 		// Calculate stars (no mistakes penalty, only time-based)
 		const stars = calculateStars(completionTime, 0, avgLetterTime, level.letters.length);
 		const xpReward = stars * 50; // 50 XP per star
-
-		console.log("🎉 Level Complete!", { stars, xp: xpReward, time: completionTime });
 
 		// Stop camera
 		stopCamera();
@@ -326,7 +361,9 @@ function LevelPlayPage() {
 				</div>
 
 				{/* Video Display */}
-				{isCameraOn && <VideoDisplay ref={videoRef} targetLetter={currentLetter} currentPrediction={prediction} confidence={confidence} onSuccess={handleLetterSuccess} showGuide={true} />}
+				{isCameraOn && (
+					<VideoDisplay ref={videoRef} targetLetter={currentLetter} currentPrediction={prediction} confidence={confidence} onSuccess={handleLetterSuccess} showGuide={true} onToggleCamera={toggleCamera} facingMode={facingMode} />
+				)}
 			</div>
 			{/* Letter Success Modal */}
 			{showLetterSuccess && (

@@ -31,7 +31,7 @@ function App() {
 						<Route path="/tentang-kami" element={<TentangKamiPage />} />
 						{/* <Route path="/tentang-bisindo" element={<TentangBisindoPage />} /> */}
 						<Route path="/hubungi-kami" element={<HubungiKamiPage />} />
-						{/* <Route path="/demo-gamification" element={<GamificationDemoPage />} /> */}
+						<Route path="/demo-gamification" element={<GamificationDemoPage />} />
 					</Routes>
 				</main>
 				<Footer />

@@ -110,9 +110,6 @@ export const GameProvider = ({ children }) => {
 					},
 				};
 				setUserProgress(merged);
-				console.log("✅ User progress loaded from localStorage");
-			} else {
-				console.log("📝 No saved progress found, using defaults");
 			}
 		} catch (error) {
 			console.error("❌ Error loading progress from localStorage:", error);
@@ -128,7 +125,6 @@ export const GameProvider = ({ children }) => {
 		if (!isLoading) {
 			try {
 				localStorage.setItem(STORAGE_KEY, JSON.stringify(userProgress));
-				console.log("💾 Progress saved to localStorage");
 			} catch (error) {
 				console.error("❌ Error saving progress to localStorage:", error);
 			}
@@ -313,7 +309,6 @@ export const GameProvider = ({ children }) => {
 	const resetProgress = useCallback(() => {
 		setUserProgress(DEFAULT_PROGRESS);
 		localStorage.removeItem(STORAGE_KEY);
-		console.log("🔄 Progress reset to default");
 	}, []);
 
 	// ========== CONTEXT VALUE ==========

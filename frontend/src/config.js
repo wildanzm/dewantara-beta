@@ -28,13 +28,4 @@ const config = {
 	ENABLE_ANALYTICS: isProduction,
 };
 
-// Log configuration in development
-if (config.ENABLE_LOGGING) {
-	console.log("🔧 DEWANTARA Config:", {
-		Environment: isDevelopment ? "Development" : "Production",
-		API: config.API_BASE_URL,
-		WebSocket: config.WS_URL,
-	});
-}
-
 export default config;

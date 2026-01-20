@@ -15,6 +15,7 @@ import "./VideoDisplay.css";
 const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-", confidence = 0, onSuccess, showGuide = true, className = "" }, ref) => {
 	const [holdProgress, setHoldProgress] = useState(0);
 	const holdTimerRef = useRef(null);
+	const successTriggeredRef = useRef(false);
 	const HOLD_DURATION = 2000; // 2 seconds in milliseconds
 	const CONFIDENCE_THRESHOLD = 0.8;
 
@@ -28,7 +29,7 @@ const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-",
 
 		if (isCorrectPrediction) {
 			// Start or continue holding
-			if (!holdTimerRef.current) {
+			if (!holdTimerRef.current && !successTriggeredRef.current) {
 				const startTime = Date.now();
 
 				holdTimerRef.current = setInterval(() => {
@@ -37,12 +38,14 @@ const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-",
 
 					setHoldProgress(progress);
 
-					if (progress >= 100) {
-						// Success! Held for 2 seconds
+					if (progress >= 100 && !successTriggeredRef.current) {
+						// Success! Held for 2 seconds - trigger once
+						successTriggeredRef.current = true;
 						clearInterval(holdTimerRef.current);
 						holdTimerRef.current = null;
-						setHoldProgress(0);
+						setHoldProgress(100);
 
+						// Call onSuccess immediately when 100% reached
 						if (onSuccess) {
 							onSuccess(targetLetter);
 						}
@@ -56,6 +59,7 @@ const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-",
 				holdTimerRef.current = null;
 			}
 			setHoldProgress(0);
+			successTriggeredRef.current = false;
 		}
 
 		// Cleanup on unmount
@@ -108,22 +112,18 @@ const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-",
 						</div>
 					</div>
 				)}
-
-				{/* Prediction Indicator */}
-				{currentPrediction !== "-" && (
-					<div className={`prediction-badge ${targetLetter && currentPrediction === targetLetter && confidence > CONFIDENCE_THRESHOLD ? "correct" : "detecting"}`}>
-						<span className="prediction-letter">{currentPrediction}</span>
-						<span className="confidence-value">{Math.round(confidence * 100)}%</span>
-					</div>
-				)}
 			</div>
+
+			{/* Prediction Indicator */}
+			{currentPrediction !== "-" && (
+				<div className={`prediction-badge ${targetLetter && currentPrediction === targetLetter && confidence > CONFIDENCE_THRESHOLD ? "correct" : "detecting"}`}>
+					<span className="prediction-letter">{currentPrediction}</span>
+					<span className="confidence-value">{Math.round(confidence * 100)}%</span>
+				</div>
+			)}
 
 			{/* Status Bar */}
 			<div className="video-status-bar">
-				<div className="status-indicator">
-					<div className="status-dot active"></div>
-					<span className="status-text">Kamera Aktif</span>
-				</div>
 				{targetLetter && (
 					<div className="target-indicator">
 						<span className="target-label">Target:</span>

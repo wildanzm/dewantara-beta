@@ -132,21 +132,32 @@ export const getPreviousLevel = (currentLevelId) => {
 };
 
 /**
- * Calculate stars based on performance
- * @param {number} completionTime - Time in seconds
- * @param {number} mistakes - Number of mistakes made
+ * Calculate stars based on performance (time-based only)
+ * @param {number} completionTime - Total time in seconds
+ * @param {number} mistakes - Number of mistakes made (not used, kept for compatibility)
+ * @param {number} avgLetterTime - Average time per letter
+ * @param {number} totalLetters - Total number of letters
  * @returns {number} Stars earned (1-3)
  */
-export const calculateStars = (completionTime, mistakes = 0) => {
-	// Perfect run (no mistakes, fast time)
-	if (mistakes === 0 && completionTime < 30) {
+export const calculateStars = (completionTime, mistakes = 0, avgLetterTime = 0, totalLetters = 5) => {
+	// Time thresholds in minutes (converted to seconds)
+	// ≤10 minutes = 3 stars
+	// ≤15 minutes = 2 stars (10 + 5)
+	// >15 minutes = 1 star
+	const threeStarTime = 10 * 60; // 10 minutes in seconds
+	const twoStarTime = 15 * 60; // 15 minutes in seconds
+
+	// 3 stars: Excellent time (≤10 minutes)
+	if (completionTime <= threeStarTime) {
 		return 3;
 	}
-	// Good run (few mistakes or decent time)
-	if (mistakes <= 2 && completionTime < 60) {
+
+	// 2 stars: Good time (≤15 minutes)
+	if (completionTime <= twoStarTime) {
 		return 2;
 	}
-	// Completed (any mistakes/time)
+
+	// 1 star: Completed the level (always rewarding!)
 	return 1;
 };
 

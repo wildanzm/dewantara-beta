@@ -231,11 +231,22 @@
 		padding: 0.8rem 2rem;
 		font-size: 1.1rem;
 		text-align: center;
-		/* Gunakan style tombol yang konsisten */
-		background-color: #4cbdd9;
-		border-radius: 8px;
+		font-family: var(--font-heading);
+		font-weight: 600;
+		/* Gunakan style tombol yang konsisten dengan palet DEWANTARA */
+		background-color: var(--color-primary);
+		border-radius: var(--radius-sm);
 		text-decoration: none;
 		color: white;
+		box-shadow: 0 4px 15px -5px rgba(182, 37, 42, 0.4);
+		transition: all 0.3s ease;
+	}
+
+	.navbar-center .mobile-cta:hover,
+	.navbar-center .mobile-cta:active {
+		background-color: var(--color-accent);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px -5px rgba(237, 30, 40, 0.5);
 	}
 
 	/* 2. Aturan untuk menyembunyikan tombol di navbar kanan */

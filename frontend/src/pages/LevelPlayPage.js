@@ -34,8 +34,13 @@ function LevelPlayPage() {
 	const [confidence, setConfidence] = useState(0);
 	const [showFeedback, setShowFeedback] = useState(false);
 	const [showLevelComplete, setShowLevelComplete] = useState(false);
-	const [startTime, setStartTime] = useState(null);
-	const [mistakes] = useState(0); // Track mistakes for star calculation
+	const [levelStats, setLevelStats] = useState({ stars: 0, xp: 0, time: 0 });
+	const [showLetterSuccess, setShowLetterSuccess] = useState(false);
+	const [completedLetter, setCompletedLetter] = useState("");
+	const [levelStartTime, setLevelStartTime] = useState(null);
+	const [letterStartTime, setLetterStartTime] = useState(null);
+	const [letterCompletionTimes, setLetterCompletionTimes] = useState([]);
+	const [mistakes, setMistakes] = useState(0);
 
 	// Redirect if level not found
 	useEffect(() => {
@@ -56,7 +61,6 @@ function LevelPlayPage() {
 		if (level) {
 			startCamera();
 			incrementAttempts(levelId);
-			setStartTime(Date.now());
 		}
 
 		return () => {
@@ -96,13 +100,16 @@ function LevelPlayPage() {
 			socketRef.current = new WebSocket(config.WS_URL);
 
 			socketRef.current.onopen = () => {
-				console.log("✅ WebSocket connected");
 				Swal.fire({
 					icon: "success",
 					title: "Kamera Aktif!",
 					text: "Mulai tunjukkan huruf BISINDO",
 					timer: 1500,
 					showConfirmButton: false,
+				}).then(() => {
+					// Start level timer after modal closes
+					setLevelStartTime(Date.now());
+					setLetterStartTime(Date.now());
 				});
 
 				// Start sending frames
@@ -198,43 +205,57 @@ function LevelPlayPage() {
 	 * Handle level completion
 	 */
 	const handleLevelComplete = useCallback(() => {
-		const completionTime = Math.floor((Date.now() - startTime) / 1000);
-		const stars = calculateStars(completionTime, mistakes);
+		const completionTime = levelStartTime ? Math.floor((Date.now() - levelStartTime) / 1000) : 0;
+		const avgLetterTime = letterCompletionTimes.length > 0 ? letterCompletionTimes.reduce((a, b) => a + b, 0) / letterCompletionTimes.length : 0;
+
+		// Calculate stars (no mistakes penalty, only time-based)
+		const stars = calculateStars(completionTime, 0, avgLetterTime, level.letters.length);
+		const xpReward = stars * 50; // 50 XP per star
+
+		console.log("🎉 Level Complete!", { stars, xp: xpReward, time: completionTime });
 
 		// Stop camera
 		stopCamera();
 
+		// Save stats for overlay
+		setLevelStats({ stars, xp: xpReward, time: completionTime });
+
 		// Update game context
 		completeLevel(levelId, stars, completionTime);
 
-		// Show level complete modal
+		// Show level complete overlay
 		setShowLevelComplete(true);
-	}, [startTime, mistakes, completeLevel, levelId]);
+	}, [levelStartTime, letterCompletionTimes, level.letters.length, completeLevel, levelId, stopCamera]);
 
 	/**
 	 * Handle successful letter completion
 	 */
 	const handleLetterSuccess = useCallback(
 		(letter) => {
-			console.log(`✅ Letter ${letter} completed!`);
+			// Track letter completion time
+			if (letterStartTime) {
+				const letterTime = (Date.now() - letterStartTime) / 1000;
+				setLetterCompletionTimes((prev) => [...prev, letterTime]);
+			}
 
-			// Show mini feedback
-			setShowFeedback(true);
+			// Show success modal
+			setCompletedLetter(letter);
+			setShowLetterSuccess(true);
 
-			// Auto-advance after 2 seconds
+			// Auto-advance after brief delay
 			setTimeout(() => {
-				setShowFeedback(false);
-
+				setShowLetterSuccess(false);
 				if (currentLetterIndex < level.letters.length - 1) {
 					// Move to next letter
 					setCurrentLetterIndex((prev) => prev + 1);
+					setLetterStartTime(Date.now()); // Reset timer for next letter
 				} else {
 					// Level complete!
 					handleLevelComplete();
 				}
-			}, 2000);
+			}, 1200);
 		},
-		[currentLetterIndex, level, handleLevelComplete],
+		[currentLetterIndex, level, letterStartTime, handleLevelComplete],
 	);
 
 	/**
@@ -307,34 +328,20 @@ function LevelPlayPage() {
 				{/* Video Display */}
 				{isCameraOn && <VideoDisplay ref={videoRef} targetLetter={currentLetter} currentPrediction={prediction} confidence={confidence} onSuccess={handleLetterSuccess} showGuide={true} />}
 			</div>
-
-			{/* Letter Complete Feedback */}
-			{showFeedback && <FeedbackOverlay isVisible={showFeedback} stars={1} xpEarned={10} completionTime={2} onClose={() => setShowFeedback(false)} />}
-
-			{/* Level Complete Modal */}
-			{showLevelComplete && (
-				<div className="modal-overlay">
-					<div className="level-complete-modal">
-						<div className="modal-icon">🎉</div>
-						<h2 className="modal-title">Level Selesai!</h2>
-						<p className="modal-subtitle">{level.title}</p>
-
-						<div className="completed-letters-grid">
-							{level.letters.map((letter) => (
-								<div key={letter} className="completed-letter-badge">
-									{letter}
-								</div>
-							))}
-						</div>
-
-						<p className="modal-message">Luar biasa! Kamu telah menguasai {level.letters.length} huruf BISINDO!</p>
-
-						<button className="modal-button" onClick={handleCloseLevelComplete}>
-							Lanjut Petualangan →
-						</button>
+			{/* Letter Success Modal */}
+			{showLetterSuccess && (
+				<div className="letter-success-overlay">
+					<div className="letter-success-card">
+						<div className="success-icon">✅</div>
+						<h2 className="success-title">Berhasil!</h2>
+						<p className="success-message">
+							Huruf <strong>{completedLetter}</strong> selesai!
+						</p>
 					</div>
 				</div>
 			)}
+			{/* Level Complete Overlay */}
+			{showLevelComplete && <FeedbackOverlay isVisible={showLevelComplete} stars={levelStats.stars} xpEarned={levelStats.xp} completionTime={levelStats.time} onClose={handleCloseLevelComplete} />}
 		</div>
 	);
 }

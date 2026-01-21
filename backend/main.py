@@ -5,11 +5,11 @@ import sys
 
 # --- SETUP LOGGING ---
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-logger = logging.getLogger("TEST_API")
+logger = logging.getLogger("DEWANTARA_FIX")
 
 app = FastAPI()
 
-# --- SETUP CORS (Buka Semua) ---
+# --- SETUP CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,29 +20,30 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "Test Server Running"}
+    return {"message": "Server Running on Port 8001"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    logger.info("⚡ DEBUG: New Connection Request")
-    
     # 1. Terima Handshake
     await websocket.accept()
-    logger.info("✅ DEBUG: Handshake Accepted!")
+    logger.info("✅ DEBUG: Handshake Sukses! Client Terhubung.")
     
-    # 2. Kirim Pesan Sambutan
-    await websocket.send_text("Hello from Server")
+    # Kirim text sambutan (Frontend aman menerima text dari server)
+    await websocket.send_text(f'{{"prediction": "Connected", "confidence": 1.0}}')
     
     try:
         while True:
-            # 3. Tunggu Data (Text)
-            data = await websocket.receive_text()
-            logger.info(f"📩 DEBUG: Terima Data: {data}")
+            # 2. TUNGGU DATA BINARY (BLOB)
+            # PENTING: Gunakan receive_bytes karena Frontend mengirim Blob
+            data = await websocket.receive_bytes()
             
-            # 4. Balas (Echo)
-            await websocket.send_text(f"Server received: {data}")
+            # logger.info(f"📩 DEBUG: Menerima {len(data)} bytes data gambar")
+            
+            # 3. Balas Dummy (Format JSON agar Frontend tidak error parse)
+            # Frontend mengharapkan JSON {prediction, confidence}
+            await websocket.send_text(f'{{"prediction": "Tes", "confidence": 0.99}}')
             
     except WebSocketDisconnect:
         logger.info("❌ DEBUG: Client Disconnected")
     except Exception as e:
-        logger.error(f"🔥 DEBUG: Error: {e}")
+        logger.error(f"🔥 DEBUG Error Fatal: {e}")

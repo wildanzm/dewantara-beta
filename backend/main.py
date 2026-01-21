@@ -4,9 +4,18 @@ import numpy as np
 import os
 import asyncio
 import base64
-import json
+import logging
+import sys
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+
+# --- KONFIGURASI LOGGER (Supaya muncul di aaPanel) ---
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger("DEWANTARA_API")
 
 # --- KONFIGURASI PATH ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +29,7 @@ try:
     import mediapipe as mp
     mp_hands = mp.solutions.hands if hasattr(mp, 'solutions') else None
 except ImportError as e:
-    print(f"Error importing MediaPipe: {e}")
+    logger.error(f"Error importing MediaPipe: {e}")
     mp_hands = None
 
 # --- CLASS LOGIKA ---
@@ -30,7 +39,7 @@ class SignLanguageDetector:
         self.scaler = self.load_file(SCALER_PATH)
 
         if mp_hands is None:
-            print("CRITICAL WARNING: MediaPipe hands module not available.")
+            logger.critical("MediaPipe hands module not available.")
         else:
             self.mp_hands = mp_hands
             self.hands = self.mp_hands.Hands(
@@ -44,40 +53,34 @@ class SignLanguageDetector:
         try:
             return joblib.load(path)
         except FileNotFoundError:
-            print(f"Error: File tidak ditemukan - {path}")
+            logger.error(f"File tidak ditemukan: {path}")
             return None
     
     def process_image(self, image_data):
         try:
-            # --- UPDATE: HANDLING BASE64 STRING ---
-            # Jika input adalah string (Base64), kita decode dulu
+            # Decode Base64 jika input string
             if isinstance(image_data, str):
-                # Hapus header "data:image/jpeg;base64," jika ada
                 if "base64," in image_data:
                     image_data = image_data.split("base64,")[1]
-                
-                # Decode base64 ke bytes
                 image_bytes = base64.b64decode(image_data)
                 nparr = np.frombuffer(image_bytes, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             else:
-                # Jika input sudah bytes (binary)
+                # Input bytes murni
                 nparr = np.frombuffer(image_data, np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
             if frame is None:
                 return None, None
             
-            # Konversi ke RGB
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            
             if hasattr(self, 'hands'):
                 results = self.hands.process(frame_rgb)
                 return results, frame
             return None, frame
             
         except Exception as e:
-            print(f"Error processing image: {e}")
+            logger.error(f"Processing Error: {e}")
             return None, None
     
     def extract_features(self, results):
@@ -100,12 +103,10 @@ class SignLanguageDetector:
             return "Model Error"
 
         results, _ = self.process_image(image_data)
-
         if not results:
             return "Tidak Terdeteksi"
         
         features = self.extract_features(results)
-
         if features and len(features) == NUM_FEATURES:
             try:
                 features_np = np.array(features).reshape(1, -1)
@@ -113,7 +114,7 @@ class SignLanguageDetector:
                 prediction = self.model.predict(scaled_data)
                 return prediction[0]
             except Exception as e:
-                print(f"Prediction Error: {e}")
+                logger.error(f"Predict Error: {e}")
                 return "Error"
         
         return "Tidak Terdeteksi"
@@ -141,42 +142,44 @@ detector = SignLanguageDetector()
 def home():
     return {"message": "DEWANTARA API Running"}
 
-# --- WEBSOCKET ENDPOINT (UPDATED) ---
+# --- WEBSOCKET ENDPOINT (LOGGING VERSION) ---
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("DEBUG: Client Connected") # Log Debug
+    logger.info("✅ DEBUG: Client Connected Successfully") 
     
+    # Kirim pesan sambutan (PENTING: Agar Frontend tahu koneksi sudah siap)
+    await websocket.send_text(str("Connected"))
+
     try:
         while True:
-            # --- UPDATE: GANTI KE receive_text() ---
-            # Kita terima sebagai TEXT karena format Base64 adalah text.
-            # receive_bytes() akan error jika Frontend kirim string.
+            # Gunakan receive_text untuk menerima Base64 string
             data = await websocket.receive_text()
             
-            # Cek apakah data kosong
+            # Log hanya jika data kosong (untuk debugging)
             if not data:
-                print("DEBUG: Terima data kosong")
+                logger.warning("⚠️ DEBUG: Menerima data kosong")
                 continue
+            
+            # Log sample data (Hanya 50 karakter pertama agar log tidak penuh)
+            # logger.info(f"📩 DEBUG: Terima Data: {data[:50]}...") 
 
-            # Jalankan prediksi (Logic decode ada di dalam class)
+            # Prediksi
             hasil_prediksi = await asyncio.to_thread(detector.predict, data)
 
-            # Kirim hasil
+            # Log hasil (Opsional, matikan jika terlalu berisik)
+            # logger.info(f"📤 DEBUG: Hasil: {hasil_prediksi}")
+
+            # Kirim balik
             await websocket.send_text(str(hasil_prediksi))
 
-            # Jeda
             await asyncio.sleep(0.01)
 
     except WebSocketDisconnect:
-        print("DEBUG: Client Disconnected Gracefully")
+        logger.info("❌ DEBUG: Client Disconnected (Normal)")
     except Exception as e:
-        print(f"DEBUG: WebSocket Error Fatal: {e}")
+        logger.error(f"🔥 DEBUG: WebSocket Error Fatal: {e}")
         try:
             await websocket.close(code=1011)
         except RuntimeError:
             pass
-
-            
-
-#for running : uvicorn main:app --host 0.0.0.0 --port 8000

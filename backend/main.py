@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import sys
+import asyncio
 
 # --- SETUP LOGGING ---
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -28,22 +29,32 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     logger.info("✅ DEBUG: Handshake Sukses! Client Terhubung.")
     
-    # Kirim text sambutan (Frontend aman menerima text dari server)
-    await websocket.send_text(f'{{"prediction": "Connected", "confidence": 1.0}}')
+    # --- TAMBAHAN PENTING: JEDA STABILISASI ---
+    # Beri waktu 0.5 detik agar koneksi benar-benar 'settled' di sisi Client/Proxy
+    await asyncio.sleep(0.5) 
     
+    # Kirim text sambutan
+    try:
+        await websocket.send_text(f'{{"prediction": "Connected", "confidence": 1.0}}')
+    except Exception as e:
+        logger.error(f"Gagal kirim sambutan: {e}")
+
     try:
         while True:
-            # 2. TUNGGU DATA BINARY (BLOB)
-            # PENTING: Gunakan receive_bytes karena Frontend mengirim Blob
+            # 2. TUNGGU DATA BINARY
             data = await websocket.receive_bytes()
             
-            # logger.info(f"📩 DEBUG: Menerima {len(data)} bytes data gambar")
+            # (Opsional: Log data masuk)
+            # logger.info("📩 Data masuk...")
+
+            # 3. Proses & Balas
+            # ... logika prediksi Anda ...
+            await websocket.send_text(f'{{"prediction": "Standby", "confidence": 0.0}}')
             
-            # 3. Balas Dummy (Format JSON agar Frontend tidak error parse)
-            # Frontend mengharapkan JSON {prediction, confidence}
-            await websocket.send_text(f'{{"prediction": "Tes", "confidence": 0.99}}')
+            # Jeda agar CPU tidak 100%
+            await asyncio.sleep(0.01)
             
     except WebSocketDisconnect:
-        logger.info("❌ DEBUG: Client Disconnected")
+        logger.info("❌ DEBUG: Client Disconnected (Normal/Network)")
     except Exception as e:
         logger.error(f"🔥 DEBUG Error Fatal: {e}")

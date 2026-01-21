@@ -122,6 +122,7 @@ detector = SignLanguageDetector() #objek detektor
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("frontend terhubung.")
+    
     try:
         while True:
             # terima data frame gambar dari frontend sebagai bytes
@@ -130,18 +131,24 @@ async def websocket_endpoint(websocket: WebSocket):
             # lakukan prediksi
             hasil_prediksi = detector.predict(data)
 
-            #kirim hasil prediksi ke frontend
+            # kirim hasil prediksi ke frontend
             await websocket.send_text(str(hasil_prediksi))
 
-            #jeda singkat untuk mencegah overload server
+            # jeda singkat untuk mencegah overload server
             await asyncio.sleep(0.01)
 
     except WebSocketDisconnect:
-        print("Klien terputus.")
+        # Koneksi sudah diputus oleh klien/browser, tidak perlu close() lagi
+        print("Klien terputus (Normal).")
+        
     except Exception as e:
+        # Tangkap error lain (misal masalah pemrosesan gambar)
         print(f"Terjadi error: {e}")
-    finally:
-        await websocket.close()
+        # Opsional: Coba tutup jika belum tertutup (pakai try-except lagi biar aman)
+        try:
+            await websocket.close()
+        except:
+            pass
 
             
 

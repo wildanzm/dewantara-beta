@@ -113,7 +113,7 @@ function LevelPlayPage() {
 
 				// Start sending frames
 				if (!intervalRef.current) {
-					intervalRef.current = setInterval(sendFrame, 400);
+					intervalRef.current = setInterval(sendFrame, 400); // 400ms interval
 				}
 			};
 
@@ -123,8 +123,9 @@ function LevelPlayPage() {
 					setPrediction(data.prediction || "-");
 					setConfidence(data.confidence || 0);
 				} catch (error) {
+					// Fallback for plain text
 					setPrediction(event.data);
-					setConfidence(0.9); // Assume high confidence for plain text
+					setConfidence(0.9);
 				}
 			};
 
@@ -137,14 +138,8 @@ function LevelPlayPage() {
 
 			socketRef.current.onerror = (error) => {
 				console.error("WebSocket error:", error);
-				Swal.fire({
-					icon: "error",
-					title: "Koneksi Gagal",
-					text: "Tidak dapat terhubung ke server AI. Pastikan backend berjalan.",
-					confirmButtonText: "Kembali",
-				}).then(() => {
-					navigate("/belajar");
-				});
+				// Optional: Don't show alert immediately on minor disconnection to avoid spam
+				// But logging is important
 			};
 		} catch (error) {
 			console.error("Camera error:", error);
@@ -209,31 +204,40 @@ function LevelPlayPage() {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
 		}
+		intervalRef.current = null;
 	}, []);
 
 	/**
-	 * Send video frame to backend
+	 * Send video frame to backend (UPDATED to Base64)
 	 */
 	const sendFrame = () => {
-		if (videoRef.current && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-			const canvas = document.createElement("canvas");
-			canvas.width = videoRef.current.videoWidth;
-			canvas.height = videoRef.current.videoHeight;
-			const ctx = canvas.getContext("2d");
-
-			ctx.scale(-1, 1);
-			ctx.drawImage(videoRef.current, -canvas.width, 0, canvas.width, canvas.height);
-
-			canvas.toBlob(
-				(blob) => {
-					if (blob && socketRef.current.readyState === WebSocket.OPEN) {
-						socketRef.current.send(blob);
-					}
-				},
-				"image/jpeg",
-				0.8,
-			);
+		// 1. Safety Checks: Pastikan video dan socket siap (ReadyState 1 = OPEN)
+		if (!videoRef.current || !socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+			return;
 		}
+
+		const video = videoRef.current;
+
+		// 2. Prevent sending 0x0 frames (Camera initializing)
+		if (video.videoWidth === 0 || video.videoHeight === 0) return;
+
+		const canvas = document.createElement("canvas");
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+		const ctx = canvas.getContext("2d");
+
+		// 3. Mirroring Logic (Flip Horizontal) - Penting untuk UX user
+		ctx.translate(canvas.width, 0);
+		ctx.scale(-1, 1);
+		ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+		// 4. Convert to Base64 String (SOLUSI UTAMA)
+		// Format: "data:image/jpeg;base64,....."
+		// Kualitas 0.7 (70%) sudah cukup bagus dan cepat
+		const base64Data = canvas.toDataURL("image/jpeg", 0.7);
+
+		// 5. Send Text Data
+		socketRef.current.send(base64Data);
 	};
 
 	/**

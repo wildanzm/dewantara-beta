@@ -3,22 +3,21 @@ import joblib
 import numpy as np
 import os
 import asyncio
+import base64
+import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-
-# --- KONFIGURASI PATH (PENTING UNTUK VPS) ---
-# Menggunakan absolute path agar file model terbaca dimanapun Gunicorn dijalankan
+# --- KONFIGURASI PATH ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, 'models/3bisindo_model.pkl')
 SCALER_PATH = os.path.join(BASE_DIR, 'models/3scaler.pkl')
 
-NUM_FEATURES = 84  # 84 fitur (2 tangan * 21 landmark * 2 koordinat)
+NUM_FEATURES = 84
 
 # --- IMPORT MEDIAPIPE ---
 try:
     import mediapipe as mp
-    # Cek ketersediaan module
     mp_hands = mp.solutions.hands if hasattr(mp, 'solutions') else None
 except ImportError as e:
     print(f"Error importing MediaPipe: {e}")
@@ -30,9 +29,7 @@ class SignLanguageDetector:
         self.model = self.load_file(MODEL_PATH)
         self.scaler = self.load_file(SCALER_PATH)
 
-        # Validasi MediaPipe
         if mp_hands is None:
-            # Di production, ini akan log error tapi tidak mematikan server seketika
             print("CRITICAL WARNING: MediaPipe hands module not available.")
         else:
             self.mp_hands = mp_hands
@@ -48,19 +45,30 @@ class SignLanguageDetector:
             return joblib.load(path)
         except FileNotFoundError:
             print(f"Error: File tidak ditemukan - {path}")
-            # Return None agar server tidak langsung crash saat startup
             return None
     
-    def process_image(self, image_bytes):
+    def process_image(self, image_data):
         try:
-            # Ubah bytes ke gambar OpenCV
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            # --- UPDATE: HANDLING BASE64 STRING ---
+            # Jika input adalah string (Base64), kita decode dulu
+            if isinstance(image_data, str):
+                # Hapus header "data:image/jpeg;base64," jika ada
+                if "base64," in image_data:
+                    image_data = image_data.split("base64,")[1]
+                
+                # Decode base64 ke bytes
+                image_bytes = base64.b64decode(image_data)
+                nparr = np.frombuffer(image_bytes, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            else:
+                # Jika input sudah bytes (binary)
+                nparr = np.frombuffer(image_data, np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
             if frame is None:
                 return None, None
             
-            # Konversi ke RGB untuk MediaPipe
+            # Konversi ke RGB
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             
             if hasattr(self, 'hands'):
@@ -81,20 +89,17 @@ class SignLanguageDetector:
             for lm in hand_landmarks.landmark:
                 all_landmarks.extend([lm.x, lm.y])
 
-        # Logika padding (isi 0 jika tangan terdeteksi kurang dari 2)
         if len(all_landmarks) < NUM_FEATURES:
             padding = [0.0] * (NUM_FEATURES - len(all_landmarks))
             all_landmarks.extend(padding)
         
-        # Potong jika lebih (opsional, untuk safety)
         return all_landmarks[:NUM_FEATURES]
     
-    def predict(self, image_bytes):
-        # Cek apakah model berhasil di-load
-        if self.model is None or self.scaler is None:
+    def predict(self, image_data):
+        if self.model is None:
             return "Model Error"
 
-        results, _ = self.process_image(image_bytes)
+        results, _ = self.process_image(image_data)
 
         if not results:
             return "Tidak Terdeteksi"
@@ -103,9 +108,9 @@ class SignLanguageDetector:
 
         if features and len(features) == NUM_FEATURES:
             try:
-                features_np = np.array(features).reshape(1, -1) # Rapikan array
-                scaled_data = self.scaler.transform(features_np) # Standarisasi
-                prediction = self.model.predict(scaled_data)     # Prediksi
+                features_np = np.array(features).reshape(1, -1)
+                scaled_data = self.scaler.transform(features_np)
+                prediction = self.model.predict(scaled_data)
                 return prediction[0]
             except Exception as e:
                 print(f"Prediction Error: {e}")
@@ -116,10 +121,8 @@ class SignLanguageDetector:
 # --- INISIALISASI APP ---
 app = FastAPI()
 
-# Konfigurasi CORS
 origins = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "https://dewantara.cloud",
     "https://www.dewantara.cloud",
 ]
@@ -132,55 +135,47 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inisialisasi Detektor
 detector = SignLanguageDetector()
 
 @app.get("/")
 def home():
-    return {"message": "DEWANTARA Sign Language API is Running"}
+    return {"message": "DEWANTARA API Running"}
 
-@app.get("/health")
-def health():
-    # Endpoint untuk cek kesehatan server
-    if detector.model is None:
-        return {"status": "unhealthy", "reason": "Model not loaded"}
-    return {"status": "healthy"}
-
-# --- WEBSOCKET ENDPOINT (FIXED) ---
+# --- WEBSOCKET ENDPOINT (UPDATED) ---
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    print("Frontend terhubung via WebSocket.")
+    print("DEBUG: Client Connected") # Log Debug
     
     try:
         while True:
-            # Terima data (Bytes dari Blob JS)
-            # Pastikan Frontend mengirim data binary (Blob), bukan Base64 string text
-            data = await websocket.receive_bytes()
+            # --- UPDATE: GANTI KE receive_text() ---
+            # Kita terima sebagai TEXT karena format Base64 adalah text.
+            # receive_bytes() akan error jika Frontend kirim string.
+            data = await websocket.receive_text()
+            
+            # Cek apakah data kosong
+            if not data:
+                print("DEBUG: Terima data kosong")
+                continue
 
-            # Lakukan prediksi
-            # Jalankan di thread pool agar tidak memblokir async loop
+            # Jalankan prediksi (Logic decode ada di dalam class)
             hasil_prediksi = await asyncio.to_thread(detector.predict, data)
 
             # Kirim hasil
             await websocket.send_text(str(hasil_prediksi))
 
-            # Jeda sangat singkat agar CPU tidak 100%
+            # Jeda
             await asyncio.sleep(0.01)
 
     except WebSocketDisconnect:
-        # Client menutup koneksi (Normal)
-        print("Klien terputus (Disconnect).")
-        # JANGAN panggil websocket.close() di sini karena sudah putus
-        
+        print("DEBUG: Client Disconnected Gracefully")
     except Exception as e:
-        # Error tidak terduga
-        print(f"WebSocket Error: {e}")
-        # Coba tutup koneksi jika masih terbuka
+        print(f"DEBUG: WebSocket Error Fatal: {e}")
         try:
             await websocket.close(code=1011)
         except RuntimeError:
-            pass # Abaikan jika sudah tertutup
+            pass
 
             
 

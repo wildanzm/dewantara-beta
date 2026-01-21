@@ -2,15 +2,14 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import sys
-import asyncio # Wajib import ini
+import asyncio
 
 # --- SETUP LOGGING ---
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-logger = logging.getLogger("DEWANTARA_FIX")
+logger = logging.getLogger("ECHO_TEST")
 
 app = FastAPI()
 
-# --- SETUP CORS ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -21,41 +20,32 @@ app.add_middleware(
 
 @app.get("/")
 def home():
-    return {"message": "Server Ready for WSS"}
+    return {"status": "Echo Server Running"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    logger.info("✅ DEBUG: Handshake Sukses!")
+    logger.info("✅ TEST KONEKSI: Handshake Sukses")
     
     try:
         while True:
-            # 1. Terima Data
+            # 1. Terima Data apapun (Bytes)
             data = await websocket.receive_bytes()
             
-            try:
-                # --- ZONA BAHAYA (AI PROCESSING) ---
-                # Bungkus kodingan CV2/MediaPipe disini
-                
-                # Contoh simulasi (Ganti dengan logika asli Anda):
-                # np_arr = np.frombuffer(data, np.uint8)
-                # img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-                # results = hands.process(img) 
-                
-                # Dummy Response (untuk tes kestabilan dulu)
-                response = '{"prediction": "Stabil", "confidence": 1.0}'
-                await websocket.send_text(response)
-                
-            except Exception as e_ai:
-                # INI PENTING: Tangkap error AI biar server tidak putus
-                logger.error(f"🔥 ERROR AI: {str(e_ai)}")
-                # Kirim feedback ke frontend biar tidak hang
-                await websocket.send_text('{"prediction": "Error AI", "confidence": 0.0}')
-
-            # Yield CPU sedikit
-            await asyncio.sleep(0.001)
+            # 2. JANGAN PROSES AI (Hanya hitung ukuran)
+            size = len(data)
             
+            # 3. Balas langsung
+            # Ini membuktikan jalur komunikasi dua arah sehat
+            await websocket.send_text(f'{{"prediction": "Server Stabil", "confidence": 1.0, "size": {size}}}')
+            
+            # Log agar kita tahu data mengalir
+            # logger.info(f"Ping! Terima {size} bytes")
+            
+            # Jeda agar tidak spam log
+            await asyncio.sleep(0.1)
+
     except WebSocketDisconnect:
-        logger.info("❌ Client Disconnected (Normal)")
+        logger.info("ℹ️ Client Disconnected (Normal)")
     except Exception as e:
-        logger.error(f"💀 CRASH FATAL: {str(e)}")
+        logger.error(f"🔥 Error: {e}")

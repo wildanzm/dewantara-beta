@@ -25,33 +25,37 @@ def home():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    # 1. Terima Handshake
     await websocket.accept()
-    logger.info("✅ DEBUG: Handshake Sukses! Client Terhubung.")
+    logger.info("✅ DEBUG: Handshake Sukses!")
     
-    # HAPUS JEDA TIDUR (asyncio.sleep) AGAR RESPONSIF
-    
-    # Kirim pesan sambutan
-    try:
-        await websocket.send_text('{"prediction": "Connected", "confidence": 1.0}')
-    except Exception as e:
-        logger.error(f"Gagal kirim sambutan: {e}")
-
     try:
         while True:
-            # 2. TERIMA DATA (Langsung baca, jangan tunggu)
+            # 1. Terima Data
             data = await websocket.receive_bytes()
             
-            # (Disini logika AI MediaPipe Anda)
-            
-            # 3. Balas Cepat
-            await websocket.send_text('{"prediction": "Membaca...", "confidence": 0.5}')
-            
-            # Jeda mikroskopis hanya untuk yield CPU (0.001 detik)
+            try:
+                # --- ZONA BAHAYA (AI PROCESSING) ---
+                # Bungkus kodingan CV2/MediaPipe disini
+                
+                # Contoh simulasi (Ganti dengan logika asli Anda):
+                # np_arr = np.frombuffer(data, np.uint8)
+                # img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+                # results = hands.process(img) 
+                
+                # Dummy Response (untuk tes kestabilan dulu)
+                response = '{"prediction": "Stabil", "confidence": 1.0}'
+                await websocket.send_text(response)
+                
+            except Exception as e_ai:
+                # INI PENTING: Tangkap error AI biar server tidak putus
+                logger.error(f"🔥 ERROR AI: {str(e_ai)}")
+                # Kirim feedback ke frontend biar tidak hang
+                await websocket.send_text('{"prediction": "Error AI", "confidence": 0.0}')
+
+            # Yield CPU sedikit
             await asyncio.sleep(0.001)
             
-    except WebSocketDisconnect as e:
-        # PENTING: Kita log kodenya untuk tahu siapa yang memutus
-        logger.info(f"❌ DEBUG: Client Disconnected. Code: {e.code}")
+    except WebSocketDisconnect:
+        logger.info("❌ Client Disconnected (Normal)")
     except Exception as e:
-        logger.error(f"🔥 DEBUG Error Fatal: {e}")
+        logger.error(f"💀 CRASH FATAL: {str(e)}")

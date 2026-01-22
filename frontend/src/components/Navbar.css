@@ -55,7 +55,7 @@
 
 .navbar-center {
 	display: flex;
-	gap: 2rem;
+	gap: 1.8rem;
 }
 
 .navbar-center .mobile-cta {
@@ -64,12 +64,13 @@
 
 .nav-link {
 	font-family: var(--font-body);
-	font-size: 1rem;
+	font-size: 0.95rem;
 	font-weight: 500;
 	color: var(--color-text-secondary);
 	text-decoration: none;
 	transition: color 0.3s ease;
 	position: relative;
+	white-space: nowrap;
 }
 
 .nav-link:hover {
@@ -142,15 +143,36 @@
 /* Tablet Landscape */
 @media (max-width: 1024px) {
 	.navbar-center {
-		gap: 1.5rem;
+		gap: 1.2rem;
 	}
 
 	.nav-link {
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 	}
 
 	.navbar-container {
 		padding: 0 0.5rem;
+	}
+
+	.navbar-right .cta-button {
+		padding: 0.65rem 1.2rem;
+		font-size: 0.9rem;
+	}
+}
+
+/* Medium Tablet */
+@media (max-width: 900px) {
+	.navbar-center {
+		gap: 1rem;
+	}
+
+	.nav-link {
+		font-size: 0.85rem;
+	}
+
+	.navbar-right .cta-button {
+		padding: 0.6rem 1rem;
+		font-size: 0.85rem;
 	}
 }
 

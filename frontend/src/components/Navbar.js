@@ -54,6 +54,9 @@ function Navbar() {
 					<NavLink to="/belajar" className="nav-link" onClick={() => setIsMenuOpen(false)}>
 						Mulai Belajar
 					</NavLink>
+					<NavLink to="/gerakan-bebas" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+						Gerakan Bebas
+					</NavLink>
 					<NavLink to="/kamus" className="nav-link" onClick={() => setIsMenuOpen(false)}>
 						Kamus
 					</NavLink>

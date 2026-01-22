@@ -75,7 +75,7 @@ const VideoDisplay = forwardRef(({ targetLetter = null, currentPrediction = "-",
 		<div className={`video-display-card ${className}`}>
 			{/* Video Container */}
 			<div className="video-wrapper">
-				<video ref={ref} id="webcam" autoPlay playsInline muted style={{ transform: "scaleX(-1)" }} />
+				<video ref={ref} id="webcam" autoPlay playsInline muted />
 
 				{/* SVG Guide Box Overlay */}
 				{showGuide && (

@@ -7,6 +7,7 @@ import Footer from "./components/Footer";
 import BerandaPage from "./pages/BerandaPage";
 import BelajarPage from "./pages/BelajarPage";
 import LevelPlayPage from "./pages/LevelPlayPage";
+import FreeDetectPage from "./pages/FreeDetectPage";
 import TentangKamiPage from "./pages/TentangKamiPage";
 import HubungiKamiPage from "./pages/HubungiKamiPage";
 import KamusPage from "./pages/KamusPage";
@@ -20,6 +21,7 @@ function App() {
 					<Routes>
 						<Route path="/" element={<BerandaPage />} />
 						<Route path="/belajar" element={<BelajarPage />} />
+						<Route path="/gerakan-bebas" element={<FreeDetectPage />} />
 						<Route path="/play/:levelId" element={<LevelPlayPage />} />
 						<Route path="/kamus" element={<KamusPage />} />
 						<Route path="/tentang-kami" element={<TentangKamiPage />} />

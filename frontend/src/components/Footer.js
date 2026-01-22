@@ -38,6 +38,9 @@ function Footer() {
 							<Link to="/belajar">Mulai Belajar</Link>
 						</li>
 						<li>
+							<Link to="/gerakan-bebas">Gerakan Bebas</Link>
+						</li>
+						<li>
 							<Link to="/kamus">Kamus</Link>
 						</li>
 						<li>

@@ -332,9 +332,6 @@ function LevelPlayPage() {
 				{/* Progress Section */}
 				<div className="progress-section">
 					<div className="progress-header">
-						<span className="progress-text">
-							Huruf {currentLetterIndex + 1} dari {level.letters.length}
-						</span>
 						<span className="progress-percentage">{Math.round(progressPercentage)}%</span>
 					</div>
 					<div className="progress-bar">

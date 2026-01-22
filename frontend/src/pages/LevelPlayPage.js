@@ -216,22 +216,27 @@ function LevelPlayPage() {
 	 */
 	const sendFrame = () => {
 		if (videoRef.current && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+			const video = videoRef.current;
 			const canvas = document.createElement("canvas");
-			canvas.width = videoRef.current.videoWidth;
-			canvas.height = videoRef.current.videoHeight;
+
+			// Resize Strategy: Width=480px, maintain aspect ratio
+			const targetWidth = 480;
+			const aspectRatio = video.videoHeight / video.videoWidth;
+			canvas.width = targetWidth;
+			canvas.height = Math.floor(targetWidth * aspectRatio);
+
 			const ctx = canvas.getContext("2d");
+			ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-			ctx.scale(-1, 1);
-			ctx.drawImage(videoRef.current, -canvas.width, 0, canvas.width, canvas.height);
-
+			// Compression: JPEG at 0.7 quality for bandwidth efficiency
 			canvas.toBlob(
 				(blob) => {
-					if (blob && socketRef.current.readyState === WebSocket.OPEN) {
+					if (blob && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
 						socketRef.current.send(blob);
 					}
 				},
 				"image/jpeg",
-				0.8,
+				0.7, // 70% quality - sweet spot for performance vs accuracy
 			);
 		}
 	};

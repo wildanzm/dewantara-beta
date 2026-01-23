@@ -131,6 +131,10 @@ app.add_middleware(
 
 detector = SignLanguageDetector() #objek detektor
 
+@app.get("/")
+def home():
+    return {"message": "Dewantara AI Server Ready", "status": "active"}
+
 # WebSocket endpoint
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

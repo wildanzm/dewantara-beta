@@ -247,7 +247,7 @@ function LevelPlayPage() {
 		setIsCameraActive(false); // Update global camera state
 		setPrediction("-");
 		setConfidence(0);
-	}, []);
+	}, [setIsCameraActive]);
 
 	/**
 	 * Send video frame to backend

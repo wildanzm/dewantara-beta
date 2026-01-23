@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { useCamera } from "../context/CameraContext";
 import VideoDisplay from "../components/VideoDisplay";
 import config from "../config";
 import "./LevelPlayPage.css"; // Reuse existing styles
@@ -12,6 +13,7 @@ import "./LevelPlayPage.css"; // Reuse existing styles
  */
 function FreeDetectPage() {
 	const navigate = useNavigate();
+	const { setIsCameraActive } = useCamera();
 
 	// Camera & WebSocket refs
 	const videoRef = useRef(null);
@@ -25,11 +27,11 @@ function FreeDetectPage() {
 	const [prediction, setPrediction] = useState("-");
 	const [confidence, setConfidence] = useState(0);
 	const [isConnecting, setIsConnecting] = useState(false);
+	const [isCameraOn, setIsCameraOn] = useState(false);
+	const [isMirrored, setIsMirrored] = useState(true);
 
-	// Start camera on mount
+	// Cleanup on unmount
 	useEffect(() => {
-		startCamera();
-
 		return () => {
 			cleanup();
 		};
@@ -91,6 +93,9 @@ function FreeDetectPage() {
 				videoRef.current.srcObject = stream;
 			}
 
+			setIsCameraOn(true);
+			setIsCameraActive(true); // Update global camera state
+
 			// Connect WebSocket with auto-reconnect
 			connectWebSocket();
 
@@ -103,13 +108,12 @@ function FreeDetectPage() {
 			});
 		} catch (error) {
 			console.error("Camera error:", error);
+			setIsCameraOn(false);
 			Swal.fire({
 				icon: "error",
 				title: "Kamera Gagal",
 				text: "Tidak dapat mengakses kamera. Pastikan izin diberikan.",
-				confirmButtonText: "Kembali",
-			}).then(() => {
-				navigate("/belajar");
+				confirmButtonText: "OK",
 			});
 		}
 	};
@@ -218,6 +222,58 @@ function FreeDetectPage() {
 	};
 
 	/**
+	 * Stop camera and WebSocket without full cleanup
+	 */
+	const stopCameraAndWebSocket = () => {
+		// Clear interval
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current);
+			intervalRef.current = null;
+		}
+
+		// Close WebSocket
+		if (socketRef.current) {
+			socketRef.current.onclose = null; // Prevent auto-reconnect
+			socketRef.current.close();
+			socketRef.current = null;
+		}
+
+		// Stop media tracks
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach((track) => track.stop());
+			streamRef.current = null;
+		}
+
+		// Clear video display
+		if (videoRef.current) {
+			videoRef.current.srcObject = null;
+		}
+
+		setIsCameraOn(false);
+		setIsCameraActive(false); // Update global camera state
+		setPrediction("-");
+		setConfidence(0);
+	};
+
+	/**
+	 * Handle camera on/off toggle
+	 */
+	const handleCameraToggle = () => {
+		if (isCameraOn) {
+			stopCameraAndWebSocket();
+		} else {
+			startCamera();
+		}
+	};
+
+	/**
+	 * Toggle mirror mode
+	 */
+	const toggleMirror = () => {
+		setIsMirrored(!isMirrored);
+	};
+
+	/**
 	 * Toggle between front and back camera
 	 */
 	const toggleCamera = async () => {
@@ -283,14 +339,26 @@ function FreeDetectPage() {
 				</button>
 				<div className="level-info">
 					<h1 className="level-title">Mode Praktek Bebas</h1>
-					<p className="level-subtitle">Latihan BISINDO tanpa batasan</p>
+					<p className="level-subtitle">Latihan dan Belajar BISINDO Tanpa Batasan</p>
 				</div>
 			</div>
 
 			{/* Main Content */}
 			<div className="play-content">
 				{/* Video Display with Prediction Footer */}
-				<VideoDisplay ref={videoRef} currentPrediction={prediction} confidence={confidence} showGuide={true} onToggleCamera={toggleCamera} facingMode={facingMode} className="free-detect-video" />
+				<VideoDisplay
+					ref={videoRef}
+					currentPrediction={prediction}
+					confidence={confidence}
+					showGuide={true}
+					onToggleCamera={toggleCamera}
+					facingMode={facingMode}
+					className="free-detect-video"
+					isCameraOn={isCameraOn}
+					onCameraToggle={handleCameraToggle}
+					isMirrored={isMirrored}
+					onToggleMirror={toggleMirror}
+				/>
 
 				{/* Connection Status */}
 				{isConnecting && (

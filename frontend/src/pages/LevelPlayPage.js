@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { useGame } from "../context/GameContext";
+import { useCamera } from "../context/CameraContext";
 import { getLevelById, calculateStars } from "../data/levels";
 import VideoDisplay from "../components/VideoDisplay";
 import { FeedbackOverlay } from "../components/gamification";
@@ -17,6 +18,7 @@ function LevelPlayPage() {
 	const { levelId } = useParams();
 	const navigate = useNavigate();
 	const { completeLevel, incrementAttempts } = useGame();
+	const { setIsCameraActive } = useCamera();
 
 	// Level data
 	const level = getLevelById(levelId);
@@ -30,6 +32,7 @@ function LevelPlayPage() {
 	// Game state
 	const [isCameraOn, setIsCameraOn] = useState(false);
 	const [facingMode, setFacingMode] = useState("user"); // "user" for front, "environment" for back
+	const [isMirrored, setIsMirrored] = useState(true);
 	const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
 	const [prediction, setPrediction] = useState("-");
 	const [confidence, setConfidence] = useState(0);
@@ -55,10 +58,9 @@ function LevelPlayPage() {
 		}
 	}, [level, navigate]);
 
-	// Start camera on mount
+	// Cleanup on unmount
 	useEffect(() => {
 		if (level) {
-			startCamera();
 			incrementAttempts(levelId);
 		}
 
@@ -94,6 +96,7 @@ function LevelPlayPage() {
 			}
 
 			setIsCameraOn(true);
+			setIsCameraActive(true); // Update global camera state
 
 			// Connect WebSocket
 			socketRef.current = new WebSocket(config.WS_URL);
@@ -141,22 +144,38 @@ function LevelPlayPage() {
 					icon: "error",
 					title: "Koneksi Gagal",
 					text: "Tidak dapat terhubung ke server AI. Pastikan backend berjalan.",
-					confirmButtonText: "Kembali",
-				}).then(() => {
-					navigate("/belajar");
+					confirmButtonText: "OK",
 				});
+				setIsCameraOn(false);
 			};
 		} catch (error) {
 			console.error("Camera error:", error);
+			setIsCameraOn(false);
 			Swal.fire({
 				icon: "error",
 				title: "Kamera Gagal",
 				text: "Tidak dapat mengakses kamera. Pastikan izin diberikan.",
-				confirmButtonText: "Kembali",
-			}).then(() => {
-				navigate("/belajar");
+				confirmButtonText: "OK",
 			});
 		}
+	};
+
+	/**
+	 * Handle camera on/off toggle
+	 */
+	const handleCameraToggle = () => {
+		if (isCameraOn) {
+			stopCamera();
+		} else {
+			startCamera();
+		}
+	};
+
+	/**
+	 * Toggle mirror mode
+	 */
+	const toggleMirror = () => {
+		setIsMirrored(!isMirrored);
 	};
 
 	/**
@@ -200,15 +219,34 @@ function LevelPlayPage() {
 	 * Stop camera and cleanup
 	 */
 	const stopCamera = useCallback(() => {
-		if (streamRef.current) {
-			streamRef.current.getTracks().forEach((track) => track.stop());
-		}
-		if (socketRef.current) {
-			socketRef.current.close();
-		}
+		// Clear interval
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
+			intervalRef.current = null;
 		}
+
+		// Close WebSocket
+		if (socketRef.current) {
+			socketRef.current.close();
+			socketRef.current = null;
+		}
+
+		// Stop media tracks
+		if (streamRef.current) {
+			streamRef.current.getTracks().forEach((track) => track.stop());
+			streamRef.current = null;
+		}
+
+		// Clear video display
+		if (videoRef.current) {
+			videoRef.current.srcObject = null;
+		}
+
+		// Update state
+		setIsCameraOn(false);
+		setIsCameraActive(false); // Update global camera state
+		setPrediction("-");
+		setConfidence(0);
 	}, []);
 
 	/**
@@ -361,9 +399,20 @@ function LevelPlayPage() {
 				</div>
 
 				{/* Video Display */}
-				{isCameraOn && (
-					<VideoDisplay ref={videoRef} targetLetter={currentLetter} currentPrediction={prediction} confidence={confidence} onSuccess={handleLetterSuccess} showGuide={true} onToggleCamera={toggleCamera} facingMode={facingMode} />
-				)}
+				<VideoDisplay
+					ref={videoRef}
+					targetLetter={currentLetter}
+					currentPrediction={prediction}
+					confidence={confidence}
+					onSuccess={handleLetterSuccess}
+					showGuide={true}
+					onToggleCamera={toggleCamera}
+					facingMode={facingMode}
+					isCameraOn={isCameraOn}
+					onCameraToggle={handleCameraToggle}
+					isMirrored={isMirrored}
+					onToggleMirror={toggleMirror}
+				/>
 			</div>
 			{/* Letter Success Modal */}
 			{showLetterSuccess && (

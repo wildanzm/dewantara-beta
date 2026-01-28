@@ -1,6 +1,7 @@
 // src/components/gamification/LevelNode.js
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import "./LevelNode.css";
 
 /**
@@ -12,8 +13,13 @@ const LevelNode = ({ level, isLocked, isCompleted, stars, isEven }) => {
 
 	const handleClick = () => {
 		if (isLocked) {
-			// Show locked message (could use a modal or toast)
-			alert(`🔒 Level terkunci! Selesaikan level sebelumnya dengan ${level.requiredStarsToUnlock} bintang.`);
+			Swal.fire({
+				icon: "warning",
+				title: "Level Terkunci!",
+				text: `Selesaikan level sebelumnya dengan ${level.requiredStarsToUnlock} bintang.`,
+				confirmButtonText: "Mengerti",
+				confirmButtonColor: "rgba(221, 162, 51, 1)",
+			});
 			return;
 		}
 		// Navigate to level gameplay

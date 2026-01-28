@@ -17,7 +17,7 @@ import "./LevelPlayPage.css";
 function LevelPlayPage() {
 	const { levelId } = useParams();
 	const navigate = useNavigate();
-	const { completeLevel, incrementAttempts } = useGame();
+	const { levelProgress, completeLevel, incrementAttempts } = useGame();
 	const { setIsCameraActive } = useCamera();
 
 	// Level data
@@ -44,19 +44,22 @@ function LevelPlayPage() {
 	const [letterStartTime, setLetterStartTime] = useState(null);
 	const [letterCompletionTimes, setLetterCompletionTimes] = useState([]);
 
-	// Redirect if level not found
+	// Redirect if level not found or locked
 	useEffect(() => {
-		if (!level) {
+		const isLocked = levelProgress[levelId] && !levelProgress[levelId].isUnlocked;
+
+		if (!level || isLocked) {
 			Swal.fire({
-				icon: "error",
-				title: "Level tidak ditemukan",
-				text: "Level yang kamu cari tidak ada.",
+				icon: "warning",
+				title: !level ? "Level tidak ditemukan" : "Level Terkunci!",
+				text: !level ? "Level yang kamu cari tidak ada." : "Kamu belum membuka level ini. Selesaikan level sebelumnya terlebih dahulu.",
 				confirmButtonText: "Kembali ke Peta",
+				confirmButtonColor: "rgba(221, 162, 51, 1)",
 			}).then(() => {
 				navigate("/belajar");
 			});
 		}
-	}, [level, navigate]);
+	}, [level, levelId, levelProgress, navigate]);
 
 	// Cleanup on unmount
 	useEffect(() => {
@@ -301,7 +304,7 @@ function LevelPlayPage() {
 
 		// Show level complete overlay
 		setShowLevelComplete(true);
-	}, [levelStartTime, letterCompletionTimes, level.letters.length, completeLevel, levelId, stopCamera]);
+	}, [levelStartTime, letterCompletionTimes, level, completeLevel, levelId, stopCamera]);
 
 	/**
 	 * Handle successful letter completion

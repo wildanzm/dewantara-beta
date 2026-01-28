@@ -20,8 +20,8 @@ except ImportError as e:
     mp_hands = None
 
 #konfigurasi
-MODEL_PATH = 'models/3bisindo_model.pkl'
-SCALER_PATH = 'models/3scaler.pkl'
+MODEL_PATH = 'models/model_bisindo_v2.pkl'
+SCALER_PATH = 'models/scaler_bisindo_v2.pkl'
 NUM_FEATURES = 84 # untuk input yaitu 84 fitur (2 tangan * 21 landmark * 2 koordinat)
 
 #bikin class untuk proses logika
@@ -39,7 +39,7 @@ class SignLanguageDetector:
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=2,  # BISINDO support (2 hands)
-            model_complexity=0,  # Lite model for faster inference
+            model_complexity=1,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
@@ -71,21 +71,30 @@ class SignLanguageDetector:
             return None, None
     
     def extract_features(self, results):
-        """Extract features with smart padding to prevent shape mismatch"""
         if not results.multi_hand_landmarks:
             return None
-        
+    
         data_aux = []
-        for hand_landmarks in results.multi_hand_landmarks:
+    
+        # 1. Urutkan tangan berdasarkan koordinat X pergelangan tangan (landmark 0)
+        # Ini agar urutan fitur (Kiri/Kanan) selalu konsisten dengan saat training
+        sorted_hands = sorted(results.multi_hand_landmarks, key=lambda h: h.landmark[0].x)
+    
+        for hand_landmarks in sorted_hands[:2]: # Ambil maksimal 2 tangan
+            # Titik referensi (Wrist/Pergelangan)
+            base_x = hand_landmarks.landmark[0].x
+            base_y = hand_landmarks.landmark[0].y
+        
             for lm in hand_landmarks.landmark:
-                data_aux.extend([lm.x, lm.y])
+                # 2. Hitung koordinat RELATIF (dikurangi base_x dan base_y)
+                data_aux.append(lm.x - base_x)
+                data_aux.append(lm.y - base_y)
 
-        # Smart padding: if only 1 hand detected (42 landmarks), pad to 84
-        # This prevents shape mismatch crashes when model expects 84 features
+        # 3. Smart padding agar tetap 84 fitur jika hanya 1 tangan yang terdeteksi
         if len(data_aux) < NUM_FEATURES:
             padding = [0.0] * (NUM_FEATURES - len(data_aux))
             data_aux.extend(padding)
-        
+    
         return data_aux
     
     def predict(self, image_bytes):

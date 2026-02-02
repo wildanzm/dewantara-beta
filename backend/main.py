@@ -4,64 +4,67 @@ import joblib
 import numpy as np
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
 import asyncio
+from pathlib import Path
 
-# Import MediaPipe dengan error handling
+# --- SETUP MEDIAPIPE ---
 try:
     import mediapipe as mp
     from mediapipe.tasks import python
     from mediapipe.tasks.python import vision
-    # Untuk versi baru MediaPipe
     mp_hands = mp.solutions.hands if hasattr(mp, 'solutions') else None
 except ImportError as e:
     print(f"Error importing MediaPipe: {e}")
     mp = None
     mp_hands = None
 
-#konfigurasi
-MODEL_PATH = 'models/model_bisindo_v2.pkl'
-SCALER_PATH = 'models/scaler_bisindo_v2.pkl'
-NUM_FEATURES = 84 # untuk input yaitu 84 fitur (2 tangan * 21 landmark * 2 koordinat)
+# --- KONFIGURASI ---
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / 'models/model_bisindo_v2.pkl'
+SCALER_PATH = BASE_DIR / 'models/scaler_bisindo_v2.pkl'
+NUM_FEATURES = 84  # (2 tangan * 21 landmark * 2 koordinat)
 
-#bikin class untuk proses logika
+# --- LOAD RESOURCES GLOBAL (Hanya 1x saat server start) ---
+# Ini penting agar RAM tidak jebol, tapi tetap aman untuk concurrency
+GLOBAL_MODEL = None
+GLOBAL_SCALER = None
+
+try:
+    GLOBAL_MODEL = joblib.load(MODEL_PATH)
+    GLOBAL_SCALER = joblib.load(SCALER_PATH)
+    print(f"✅ Model & Scaler loaded successfully from {MODEL_PATH}")
+except Exception as e:
+    print(f"🔥 FATAL ERROR loading model: {e}")
+
+# --- CLASS LOGIKA (Di-instantiate PER USER) ---
 class SignLanguageDetector:
-    def __init__(self):
-        self.model = self.load_file(MODEL_PATH)
-        self.scaler = self.load_file(SCALER_PATH)
+    def __init__(self, model, scaler):
+        # Menerima model global, tapi membuat instance MediaPipe baru
+        self.model = model
+        self.scaler = scaler
 
-        # Initialize MediaPipe with performance optimization
         if mp_hands is None:
-            raise RuntimeError("MediaPipe hands module not available. Please install mediapipe correctly.")
+            raise RuntimeError("MediaPipe not available.")
         
         self.mp_hands = mp_hands
-        # Performance vs. Accuracy Sweet Spot: Lite model (complexity=0) for speed
+        # Konfigurasi MediaPipe (Stateful untuk tracking yang stabil)
         self.hands = self.mp_hands.Hands(
-            static_image_mode=False,
-            max_num_hands=2,  # BISINDO support (2 hands)
-            model_complexity=1,
+            static_image_mode=False,    # False = Tracking Mode (Lebih Cepat & Stabil)
+            max_num_hands=2,            # Support 2 tangan
+            model_complexity=1,         # 0 = Lite (Cepat di Render), 1 = Full (Akurat)
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )
-
-    def load_file(self, path):
-        try:
-            return joblib.load(path)
-        except FileNotFoundError:
-            print(f"Error: File tidak ditemukan - {path}")
-            exit()
     
     def process_image(self, image_bytes):
         """Process image with robust error handling"""
         try:
-            # Convert bytes to OpenCV image
             nparr = np.frombuffer(image_bytes, np.uint8)
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
             if frame is None:
                 return None, None
             
-            # Convert to RGB for MediaPipe
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = self.hands.process(frame_rgb)
             return results, frame
@@ -73,44 +76,47 @@ class SignLanguageDetector:
     def extract_features(self, results):
         if not results.multi_hand_landmarks:
             return None
-    
+        
         data_aux = []
-    
-        # 1. Urutkan tangan berdasarkan koordinat X pergelangan tangan (landmark 0)
-        # Ini agar urutan fitur (Kiri/Kanan) selalu konsisten dengan saat training
+        
+        # 1. Urutkan tangan berdasarkan X (agar Kiri/Kanan konsisten)
         sorted_hands = sorted(results.multi_hand_landmarks, key=lambda h: h.landmark[0].x)
-    
-        for hand_landmarks in sorted_hands[:2]: # Ambil maksimal 2 tangan
-            # Titik referensi (Wrist/Pergelangan)
+        
+        for hand_landmarks in sorted_hands[:2]:
+            # Titik referensi (Wrist) untuk koordinat relatif
             base_x = hand_landmarks.landmark[0].x
             base_y = hand_landmarks.landmark[0].y
-        
+            
             for lm in hand_landmarks.landmark:
-                # 2. Hitung koordinat RELATIF (dikurangi base_x dan base_y)
+                # Hitung koordinat RELATIF (Normalisasi posisi)
                 data_aux.append(lm.x - base_x)
                 data_aux.append(lm.y - base_y)
 
-        # 3. Smart padding agar tetap 84 fitur jika hanya 1 tangan yang terdeteksi
+        # 2. Smart Padding (Jika cuma 1 tangan, isi sisa dengan 0)
         if len(data_aux) < NUM_FEATURES:
             padding = [0.0] * (NUM_FEATURES - len(data_aux))
             data_aux.extend(padding)
-    
-        return data_aux
+        
+        # Potong jika kelebihan (safety)
+        return data_aux[:NUM_FEATURES]
     
     def predict(self, image_bytes):
-        """Main prediction function called by WebSocket"""
+        """Main prediction function"""
+        if self.model is None or self.scaler is None:
+            return "Model Error"
+
         try:
             results, _ = self.process_image(image_bytes)
 
-            if not results:
+            if not results or not results.multi_hand_landmarks:
                 return "Tidak Terdeteksi"
             
             features = self.extract_features(results)
 
             if features and len(features) == NUM_FEATURES:
-                features_np = np.array(features).reshape(1, -1)  # Reshape features
-                scaled_data = self.scaler.transform(features_np)  # Standardize features
-                prediction = self.model.predict(scaled_data)  # Predict
+                features_np = np.array(features).reshape(1, -1)
+                scaled_data = self.scaler.transform(features_np)
+                prediction = self.model.predict(scaled_data)
                 return prediction[0]
             
             return "Tidak Terdeteksi"
@@ -118,16 +124,21 @@ class SignLanguageDetector:
         except Exception as e:
             print(f"Prediction error: {e}")
             return "Error"
-    
-# Inisialisasi FastAPI
+
+    def close(self):
+        """Membersihkan resource MediaPipe saat user putus"""
+        if self.hands:
+            self.hands.close()
+
+# --- SERVER SETUP ---
 app = FastAPI()
 
-# Configure CORS for production
 origins = [
-    "http://localhost:3000",           # Local development
-    "http://127.0.0.1:3000",           # Local development alternative
-    "https://dewantara.cloud",         # Production domain
-    "https://www.dewantara.cloud",     # Production domain with www
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://dewantara.cloud",
+    "https://www.dewantara.cloud",
+    "https://api.dewantara.cloud",
 ]
 
 app.add_middleware(
@@ -138,43 +149,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-detector = SignLanguageDetector() #objek detektor
-
 @app.get("/")
 def home():
     return {"message": "Dewantara AI Server Ready", "status": "active"}
 
-# WebSocket endpoint
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("Frontend connected.")
     
-    # Proxy bypass: Send welcome packet to flush Cloudflare/Render buffers
-    await websocket.send_json({"status": "connected", "message": "Welcome to BISINDO Detection API"})
+    # 1. Instantiate Detektor LOKAL (Khusus untuk user ini saja)
+    #    Menggunakan Global Model agar hemat RAM
+    local_detector = SignLanguageDetector(GLOBAL_MODEL, GLOBAL_SCALER)
+    
+    # Proxy bypass message
+    await websocket.send_json({"status": "connected", "message": "Welcome"})
     
     try:
         while True:
-            # Receive image frame from frontend as bytes
             data = await websocket.receive_bytes()
 
-            # Perform prediction
-            prediction_result = detector.predict(data)
+            # 2. Gunakan local_detector untuk prediksi
+            prediction_result = local_detector.predict(data)
 
-            # Send prediction result to frontend
             await websocket.send_text(str(prediction_result))
-
-            # Brief delay to prevent server overload
             await asyncio.sleep(0.01)
 
     except WebSocketDisconnect:
-        # Connection already closed by client/browser, no need to close() again
-        # This prevents "Double Close" runtime errors
         print("Client disconnected (Normal).")
+        # 3. Bersihkan memori user ini
+        local_detector.close()
     
     except Exception as e:
-        # Catch other errors (e.g., image processing issues)
         print(f"WebSocket error: {e}")
+        local_detector.close()
 
             
 

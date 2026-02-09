@@ -49,9 +49,9 @@ class SignLanguageDetector:
         self.mp_hands = mp_hands
         # Konfigurasi MediaPipe (Stateful untuk tracking yang stabil)
         self.hands = self.mp_hands.Hands(
-            static_image_mode=False,    # False = Tracking Mode (Lebih Cepat & Stabil)
+            static_image_mode=True,    # False = Tracking Mode (Lebih Cepat & Stabil)
             max_num_hands=2,            # Support 2 tangan
-            model_complexity=1,         # 0 = Lite (Cepat di Render), 1 = Full (Akurat)
+            model_complexity=0,         # 0 = Lite (Cepat di Render), 1 = Full (Akurat)
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5
         )

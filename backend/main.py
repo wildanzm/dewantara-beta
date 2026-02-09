@@ -169,8 +169,8 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             data = await websocket.receive_bytes()
 
-            # 2. Gunakan local_detector untuk prediksi
-            prediction_result = local_detector.predict(data)
+            # 2. Gunakan local_detector untuk prediksi (jalankan di thread terpisah agar async)
+            prediction_result = await asyncio.to_thread(local_detector.predict, data)
 
             await websocket.send_text(str(prediction_result))
             await asyncio.sleep(0.01)
